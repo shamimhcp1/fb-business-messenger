@@ -1,36 +1,95 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Next.js 15 + Tailwind CSS v4 + shadcn/ui Starter Kit
 
-## Getting Started
+An opinionated starter template combining:
 
-First, run the development server:
+- Next.js 15 (App Router) with React 19
+- Tailwind CSS v4 (config‑less via PostCSS plugin)
+- shadcn/ui (Radix primitives, Lucide icons)
+- Dark mode via `next-themes`
+- TypeScript, ESLint (flat config), Turbopack
+
+This repo is ready for local development and Vercel deployment.
+
+## Quick Start
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# 1) Install deps
+npm install
+# or: pnpm install | yarn | bun install
+
+# 2) Dev server
+npm run dev   # http://localhost:3000
+
+# 3) Build & start
+npm run build
+npm start
+
+# 4) Lint
+npm run lint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## What’s Included
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Next: `15.x`, React: `19.x`
+- Tailwind: `^4` with `@tailwindcss/postcss` (see `postcss.config.mjs`)
+- Prebuilt components in `components/ui/*` (e.g. `button`, `dropdown-menu`)
+- Theme provider and dark mode toggle (`components/theme-provider.tsx`, `components/ModeToggle.tsx`)
+- Utility `cn` helper (`lib/utils.ts`)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Project Structure
 
-## Learn More
+- `app/`
+  - `layout.tsx`: App shell + `ThemeProvider`
+  - `page.tsx`: Example page using `Button` and `ModeToggle`
+  - `globals.css`: Tailwind v4 imports, CSS variables, theme tokens
+- `components/`: shadcn/ui components and theme utilities
+- `lib/`: utilities
+- Config: `next.config.ts`, `postcss.config.mjs`, `eslint.config.mjs`, `tsconfig.json`
 
-To learn more about Next.js, take a look at the following resources:
+## Tailwind CSS v4
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Tailwind v4 is configured via PostCSS only (no `tailwind.config.*`).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Imports live in `app/globals.css`:
 
-## Deploy on Vercel
+  ```css
+  @import "tailwindcss";
+  @import "tw-animate-css";
+  ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- PostCSS plugins are defined in `postcss.config.mjs`:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+  ```js
+  const config = { plugins: ["@tailwindcss/postcss"] };
+  export default config;
+  ```
+
+- Theme tokens are authored with CSS variables in `:root` and `.dark`, and exposed via an `@theme inline` block for semantic usage (e.g., `--color-primary`).
+
+## shadcn/ui
+
+- Components live under `components/ui/*` and are styled with Tailwind utilities.
+- The example page shows `Button` and a theme `ModeToggle`.
+- You can add more components using the CLI:
+
+  ```bash
+  npx shadcn@latest add accordion
+  ```
+
+  This repo includes a `components.json` for the CLI. If you use the CLI, ensure its Tailwind CSS path matches where your globals live (here it’s `app/globals.css`).
+
+## Theming & Dark Mode
+
+- `ThemeProvider` from `next-themes` is set up in `app/layout.tsx`.
+- Dark mode uses the `class` strategy (applied on `<html>`).
+- Use `ModeToggle` to switch between light, dark, and system.
+
+## Deploy
+
+- Deploy easily to Vercel (recommended). Push your repo and import it at https://vercel.com.
+- Next.js deployment docs: https://nextjs.org/docs/app/building-your-application/deploying
+
+---
+
+Happy shipping!
+
