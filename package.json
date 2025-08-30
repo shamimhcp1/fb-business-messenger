@@ -25,6 +25,7 @@
     "drizzle-orm": "^0.33.0",
     "ioredis": "^5.4.1",
     "jose": "^5.9.6",
+    "localtunnel": "^2.0.2",
     "lucide-react": "^0.542.0",
     "next": "15.5.2",
     "next-auth": "^4.24.7",
