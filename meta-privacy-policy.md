@@ -32,7 +32,7 @@ We implement administrative, technical, and physical safeguards designed to prot
 Depending on your location, you may have rights to access, correct, or delete your personal data. Contact us to exercise these rights.
 
 ## Contact Us
-If you have questions or concerns about this policy, contact us at **privacy@example.com**.
+If you have questions or concerns about this policy, contact us at **info@antorbon.com**.
 
 Using FB Business Messenger signifies your acceptance of this Privacy Policy. We may update this policy from time to time. Continued use after updates constitutes acceptance.
 
