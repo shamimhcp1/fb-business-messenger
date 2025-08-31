@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 export async function GET() {
   const appId = process.env.META_APP_ID!
-  const v = process.env.META_API_VERSION || 'v20.0'
+  const v = process.env.META_API_VERSION || 'v23.0'
   const base = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
   const redirectUri = `${base}/api/meta/callback`
   const scope = [
