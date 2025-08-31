@@ -127,13 +127,30 @@ R2_BUCKET=attachments
 npm run db:migrate
 ```
 
-4) Start the app
+4) Seed a first user (required for Meta connect)
+
+The Meta OAuth callback associates connected Pages to the first user’s tenant. On a fresh database you must seed one user, otherwise the callback redirects with `error=no_user`.
+
+```bash
+npx tsx scripts/seed-dev-user.ts
+```
+
+You can override the defaults via optional env vars in `.env.local`:
+
+```
+SEED_USER_EMAIL=owner@example.com
+SEED_USER_PASSWORD=change-me
+```
+
+This script is for local/dev usage only.
+
+5) Start the app
 
 ```bash
 npm run dev  # http://localhost:3000
 ```
 
-5) Start the worker
+6) Start the worker
 
 - The worker is TypeScript (`worker/index.ts`). Run it with your preferred TS runner (e.g., `tsx`):
 
@@ -141,7 +158,7 @@ npm run dev  # http://localhost:3000
 npx tsx worker/index.ts
 ```
 
-6) Webhooks in local dev
+7) Webhooks in local dev
 
 - Expose your local server using `localtunnel` (or similar):
 
@@ -225,4 +242,3 @@ Notes:
 ## Contributing
 
 Issues and PRs are welcome. Please include clear steps to reproduce and keep changes focused. For larger features, open an issue first to discuss scope and approach.
-
