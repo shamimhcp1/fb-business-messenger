@@ -59,7 +59,7 @@ export async function GET(req: Request) {
         .values({
           id: crypto.randomUUID(),
           tenantId: anyUser.tenantId,
-          pageId: p.id,
+          pageId: String(p.id).trim(),
           pageName: p.name,
           pageTokenEnc: enc,
           connectedByUserId: anyUser.id,

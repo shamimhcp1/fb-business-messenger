@@ -38,8 +38,21 @@ export async function POST(req: Request) {
   }
 
   const entries = body.entry || []
+  // Temporary debug log to verify delivery (remove in production)
+  try {
+    const first = entries[0]
+    const pageId = first?.id
+    const messaging = first?.messaging?.[0]
+    const kind = messaging?.message ? 'message' : messaging?.delivery ? 'delivery' : messaging?.read ? 'read' : 'other'
+    console.log('meta:webhook', {
+      entries: entries.length,
+      pageId,
+      kind,
+      timestamp: messaging?.timestamp,
+    })
+  } catch {}
   for (const entry of entries) {
-    await webhookQueue.add(
+    const job = await webhookQueue.add(
       'page-event',
       { entry },
       {
@@ -48,8 +61,9 @@ export async function POST(req: Request) {
         backoff: { type: 'exponential', delay: 1000 },
       }
     )
+    // Temporary debug log (remove in production)
+    console.log('meta:webhook:enqueued', { jobId: job.id })
   }
 
   return NextResponse.json({ ok: true })
 }
-
