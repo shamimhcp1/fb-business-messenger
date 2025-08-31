@@ -27,7 +27,7 @@ This file provides guidance for contributors and coding agents working in this r
    ```bash
    npx tsx worker/index.ts
    ```
-6. For local webhook testing, expose port 3000 with a tunneling tool (e.g., `npx localtunnel --port 3000 --subdomain antorbon`).
+6. For local webhook testing, expose port 3000 with a tunneling tool (e.g., `npx localtunnel --port 3000 --subdomain fb-messenger`).
 
 ## Coding Guidelines
 - Use TypeScript for all application and worker code.
