@@ -35,6 +35,8 @@ This file provides guidance for contributors and coding agents working in this r
 - Validate Meta (Facebook) webhook signatures and adhere to the 24-hour messaging policy.
 - Encrypt stored tokens using AES‑GCM with the `ENCRYPTION_PASS` environment variable.
 - Keep pull requests focused and document any new environment variables or migration steps.
+- Ensure to use proper commenting where needed.
+- Allways use proper types schemas, never use "any" for type.
 
 ## Programmatic Checks
 Run the lint script before committing:
