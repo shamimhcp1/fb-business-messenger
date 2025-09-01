@@ -8,9 +8,9 @@ import crypto from 'crypto'
 
 export async function GET(
   _req: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
-  const id = params.id
+  const { id } = await context.params
   const rows = await db
     .select()
     .from(msgs)
@@ -22,9 +22,9 @@ export async function GET(
 
 export async function POST(
   req: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
-  const id = params.id
+  const { id } = await context.params
   const body = await req.json()
   const { text, tag } = body
   const conv = (await db.select().from(convs).where(eq(convs.id, id)).limit(1))[0]
@@ -47,7 +47,7 @@ export async function POST(
   if (!conn) return NextResponse.json({ error: 'no_connection' }, { status: 400 })
 
   const token = decrypt(unpack(conn.pageTokenEnc))
-  const payload: any = {
+  const payload: { recipient: { id: string }; message: { text: string }; tag?: string } = {
     recipient: { id: conv.psid },
     message: { text },
   }
@@ -57,14 +57,29 @@ export async function POST(
 
   const newId = crypto.randomUUID()
   const mid = 'local-' + crypto.randomUUID()
+  const timestamp = new Date()
   await db.insert(msgs).values({
     id: newId,
     conversationId: conv.id,
     direction: 'outbound',
     mid,
     text,
-    timestamp: new Date(),
+    timestamp,
+    deliveryState: 'sent',
   })
 
-  return NextResponse.json({ ok: true, message: { id: newId, mid, text } })
+  return NextResponse.json({
+    ok: true,
+    message: {
+      id: newId,
+      conversationId: conv.id,
+      direction: 'outbound',
+      mid,
+      text,
+      attachmentsJson: null,
+      timestamp: timestamp.toISOString(),
+      deliveryState: 'sent',
+      readAt: null,
+    },
+  })
 }
