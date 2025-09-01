@@ -87,7 +87,18 @@ export function InboxPage() {
                     m.direction === 'outbound' ? 'justify-end' : 'justify-start'
                   }`}
                 >
-                  <div className="px-2 py-1 rounded bg-gray-200">{m.text}</div>
+                  <div className="px-2 py-1 rounded bg-gray-200 flex items-end gap-1">
+                    {m.text}
+                    {m.direction === 'outbound' && (
+                      <span
+                        className={`text-xs ${
+                          m.readAt ? 'text-blue-500' : 'text-gray-500'
+                        }`}
+                      >
+                        {m.readAt ? '✓✓' : '✓'}
+                      </span>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
