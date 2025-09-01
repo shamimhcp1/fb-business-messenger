@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { exchangeCodeForToken, exchangeLongLivedUserToken, getPages, subscribePage } from '@/lib/meta'
 import { db } from '@/db'
 import { users, facebookConnections } from '@/db/schema'
-import { eq } from 'drizzle-orm'
+import { and, eq, inArray } from 'drizzle-orm'
 import { encrypt, pack } from '@/lib/crypto'
 import crypto from 'crypto'
 
@@ -52,6 +52,20 @@ export async function GET(req: Request) {
       return NextResponse.redirect(noUserUrl)
     }
 
+    // If connections for these pages ever existed and were manually deleted,
+    // ensure we start clean to avoid any stale uniqueness edge-cases.
+    if (pages.data.length > 0) {
+      const pageIds = pages.data.map((p) => String(p.id).trim())
+      await db
+        .delete(facebookConnections)
+        .where(
+          and(
+            eq(facebookConnections.tenantId, anyUser.tenantId),
+            inArray(facebookConnections.pageId, pageIds)
+          )
+        )
+    }
+
     for (const p of pages.data) {
       const enc = pack(encrypt(p.access_token))
       await db
@@ -73,7 +87,15 @@ export async function GET(req: Request) {
             status: 'active',
           },
         })
-      await subscribePage(p.id, p.access_token)
+      // Ignore "already subscribed" errors so DB writes are not rolled back by a Graph API 400.
+      try {
+        await subscribePage(p.id, p.access_token)
+      } catch (err: any) {
+        const msg = err?.response?.data?.error?.message || err?.message || ''
+        if (!/already\s+subscribed/i.test(msg)) {
+          throw err
+        }
+      }
     }
 
     const okUrl = new URL(connectionsUrl)
