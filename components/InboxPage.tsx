@@ -59,7 +59,18 @@ export function InboxPage() {
                   selectedId === c.id ? 'bg-gray-200' : 'hover:bg-gray-100'
                 }`}
               >
-                {c.psid}
+                <span className="flex items-center gap-2">
+                  {c.profilePic ? (
+                    <img
+                      src={c.profilePic}
+                      alt={c.name || c.psid}
+                      className="w-6 h-6 rounded-full"
+                    />
+                  ) : (
+                    <span className="w-6 h-6 rounded-full bg-gray-300" />
+                  )}
+                  <span>{c.name || c.psid}</span>
+                </span>
               </button>
             </li>
           ))}

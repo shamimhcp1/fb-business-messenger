@@ -59,3 +59,11 @@ export async function sendMessage(pageId: string, pageAccessToken: string, body:
   return data
 }
 
+export async function getUserProfile(psid: string, pageAccessToken: string) {
+  const { data } = await axios.get(`${API}/${psid}`, {
+    params: { fields: 'name,picture' },
+    headers: { Authorization: `Bearer ${pageAccessToken}` },
+  })
+  return data as { name?: string; picture?: { data?: { url?: string } } }
+}
+

@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server'
 import { db } from '@/db'
-import { conversations } from '@/db/schema'
+import { conversations, facebookConnections } from '@/db/schema'
 import { and, eq, like, desc } from 'drizzle-orm'
+import { decrypt, unpack } from '@/lib/crypto'
+import { getUserProfile } from '@/lib/meta'
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
@@ -21,5 +23,36 @@ export async function GET(req: Request) {
     .orderBy(desc(conversations.lastMessageAt))
     .limit(50)
 
-  return NextResponse.json({ data: rows })
+  const data = await Promise.all(
+    rows.map(async (row) => {
+      try {
+        const conn = (
+          await db
+            .select()
+            .from(facebookConnections)
+            .where(
+              and(
+                eq(facebookConnections.tenantId, row.tenantId),
+                eq(facebookConnections.pageId, row.pageId),
+              ),
+            )
+            .limit(1)
+        )[0]
+        if (conn) {
+          const token = decrypt(unpack(conn.pageTokenEnc))
+          const profile = await getUserProfile(row.psid, token)
+          return {
+            ...row,
+            name: profile.name,
+            profilePic: profile.picture?.data?.url,
+          }
+        }
+      } catch (err) {
+        console.error('conversation_profile_fetch_error', err)
+      }
+      return row
+    }),
+  )
+
+  return NextResponse.json({ data })
 }
