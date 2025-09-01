@@ -7,6 +7,8 @@ export interface Conversation {
   unreadCount: number;
   assigneeUserId: string | null;
   status: string;
+  name?: string;
+  profilePic?: string;
 }
 
 export type MessageDirection = 'inbound' | 'outbound';
