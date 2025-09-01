@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { io } from 'socket.io-client'
 import type { Conversation, Message, ApiListResponse } from '@/lib/types'
 
 async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
@@ -16,6 +17,8 @@ export function InboxPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [text, setText] = useState('')
+  const socketRef = useRef<ReturnType<typeof io> | null>(null)
+  const selectedIdRef = useRef<string | null>(null)
 
   useEffect(() => {
     fetchJson<ApiListResponse<Conversation>>('/api/inbox/conversations')
@@ -29,6 +32,52 @@ export function InboxPage() {
       .then((data) => setMessages(data.data))
       .catch(() => setMessages([]))
   }, [selectedId])
+
+  useEffect(() => {
+    selectedIdRef.current = selectedId
+  }, [selectedId])
+
+  useEffect(() => {
+    const socket = io()
+    socketRef.current = socket
+
+    const handleMessageNew = ({
+      conversationId,
+      message,
+      conversation,
+    }: {
+      conversationId: string
+      message: Message
+      conversation: Conversation
+    }) => {
+      if (selectedIdRef.current === conversationId) {
+        setMessages((prev) => [...prev, message])
+      }
+      setConversations((prev) =>
+        prev.map((c) => (c.id === conversation.id ? conversation : c)),
+      )
+    }
+
+    socket.on('message:new', handleMessageNew)
+
+    return () => {
+      socket.off('message:new', handleMessageNew)
+      socket.disconnect()
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!socketRef.current || conversations.length === 0) return
+    const rooms = Array.from(
+      new Set(
+        conversations.flatMap((c) => [
+          `tenant:${c.tenantId}`,
+          `page:${c.pageId}`,
+        ]),
+      ),
+    )
+    socketRef.current.emit('join', rooms)
+  }, [conversations])
 
   const sendMessage = async () => {
     if (!selectedId || !text.trim()) return
