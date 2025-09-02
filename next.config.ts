@@ -12,6 +12,14 @@ const nextConfig: NextConfig = {
       allowedOrigins: ["https://fb-messenger.loca.lt"],
     },
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "platform-lookaside.fbsbx.com",
+      },
+    ],
+  },
 };
 
 export default nextConfig;

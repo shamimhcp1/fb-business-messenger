@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { socket } from "@/lib/socketClient";
 import type { Conversation, Message, ApiListResponse } from '@/lib/types'
+import Image from 'next/image';
 
 async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(url, options)
@@ -107,15 +108,17 @@ export function InboxPage() {
                 type="button"
                 onClick={() => setSelectedId(c.id)}
                 className={`block w-full text-left px-2 py-1 rounded ${
-                  selectedId === c.id ? 'bg-gray-200' : 'hover:bg-gray-100'
+                  selectedId === c.id ? 'bg-gray-200 dark:bg-gray-700' : 'hover:bg-gray-100'
                 }`}
               >
                 <span className="flex items-center gap-2">
                   {c.profilePic ? (
-                    <img
+                    <Image
                       src={c.profilePic}
                       alt={c.name || c.psid}
                       className="w-6 h-6 rounded-full"
+                      width={24}
+                      height={24}
                     />
                   ) : (
                     <span className="w-6 h-6 rounded-full bg-gray-300" />
@@ -130,7 +133,7 @@ export function InboxPage() {
       <section className="flex-1 flex flex-col">
         {selectedId ? (
           <>
-            <div className="flex-1 overflow-y-auto mb-4 space-y-2">
+            <div className="flex-1 overflow-y-auto mb-4 space-y-2 max-h-[75vh]">
               {messages.map((m) => (
                 <div
                   key={m.id}
@@ -138,7 +141,7 @@ export function InboxPage() {
                     m.direction === 'outbound' ? 'justify-end' : 'justify-start'
                   }`}
                 >
-                  <div className="px-2 py-1 rounded bg-gray-200 flex items-end gap-1">
+                  <div className="px-2 py-1 rounded bg-gray-200 dark:bg-gray-700 flex items-end gap-1">
                     {m.text}
                     {m.direction === 'outbound' && (
                       <span
@@ -157,7 +160,8 @@ export function InboxPage() {
               <input
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                className="flex-1 border rounded px-2 py-1"
+                onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+                className="flex-1 border dark:border-gray-600 rounded px-2 py-1"
                 placeholder="Type a message"
               />
               <button

@@ -40,7 +40,18 @@ export async function POST(req: Request) {
   const entries = (body as { entry?: unknown[] }).entry || []
   // Temporary debug log to verify delivery (remove in production)
   try {
-    const first = entries[0]
+    interface MessagingEntry {
+      message?: { mid?: string; text?: string };
+      delivery?: { watermark?: number };
+      read?: { watermark?: number };
+      timestamp?: number;
+      sender?: { id?: string };
+      recipient?: { id?: string };
+    }
+    
+    const first = entries[0] as
+      | { id?: string; messaging?: MessagingEntry[] }
+      | undefined;
     const pageId = first?.id
     const messaging = first?.messaging?.[0]
     const kind = messaging?.message ? 'message' : messaging?.delivery ? 'delivery' : messaging?.read ? 'read' : 'other'
