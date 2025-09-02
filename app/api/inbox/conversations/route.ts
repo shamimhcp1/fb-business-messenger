@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { db } from '@/db'
 import { conversations, facebookConnections } from '@/db/schema'
-import { and, eq, like, desc } from 'drizzle-orm'
+import { and, eq, like, desc, SQL } from 'drizzle-orm'
 import { decrypt, unpack } from '@/lib/crypto'
 import { getUserProfile } from '@/lib/meta'
 
@@ -11,7 +11,7 @@ export async function GET(req: Request) {
   const pageId = searchParams.get('pageId') || undefined
   const q = searchParams.get('q') || undefined
 
-  const conds = [] as any[]
+  const conds: SQL[] = []
   if (tenantId) conds.push(eq(conversations.tenantId, tenantId))
   if (pageId) conds.push(eq(conversations.pageId, pageId))
   if (q) conds.push(like(conversations.psid, `%${q}%`))
@@ -19,7 +19,7 @@ export async function GET(req: Request) {
   const rows = await db
     .select()
     .from(conversations)
-    .where(conds.length ? and(...conds) : undefined as any)
+    .where(conds.length ? and(...conds) : undefined)
     .orderBy(desc(conversations.lastMessageAt))
     .limit(50)
 

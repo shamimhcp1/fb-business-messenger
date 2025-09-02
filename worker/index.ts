@@ -6,24 +6,30 @@ import { conversations, facebookConnections, messages } from '@/db/schema'
 import { and, eq, sql, lte } from 'drizzle-orm'
 import { Emitter } from '@socket.io/redis-emitter'
 import crypto from 'crypto'
+import type { RedisOptions } from 'ioredis'
 
-const connection = redis.options as any
+const connection: RedisOptions = redis.options
 
 const queueName = 'webhooks'
 const queueEvents = new QueueEvents(queueName, { connection })
 
-function getEventId(entry: any) {
-  try {
-    const messaging = entry.messaging?.[0]
-    return messaging?.message?.mid || messaging?.delivery?.watermark?.toString() || messaging?.timestamp?.toString()
-  } catch {
-    return undefined
-  }
+interface MessagingEntry {
+  message?: { mid?: string; text?: string }
+  delivery?: { watermark?: number }
+  read?: { watermark?: number }
+  timestamp?: number
+  sender?: { id?: string }
+  recipient?: { id?: string }
 }
 
-const emitter = new Emitter(redis as any)
+interface WebhookEntry {
+  id?: string
+  messaging?: MessagingEntry[]
+}
 
-async function upsertFromEntry(entry: any) {
+const emitter = new Emitter(redis)
+
+async function upsertFromEntry(entry: WebhookEntry) {
   const pageId = String(entry.id).trim()
   const messaging = entry.messaging?.[0]
   if (!messaging) {
@@ -111,7 +117,7 @@ async function upsertFromEntry(entry: any) {
     emitter
       .to(`tenant:${conversation.tenantId}`)
       .to(`page:${pageId}`)
-      .emit('message:new', { conversationId: conversation.id, message })
+      .emit('message:new', { conversationId: conversation.id, message, conversation })
     return
   }
 
@@ -149,7 +155,11 @@ async function upsertFromEntry(entry: any) {
   console.log('worker:skip_unhandled', { kind, pageId })
 }
 
-export const worker = new Worker(
+interface WebhookJobData {
+  entry: WebhookEntry
+}
+
+export const worker = new Worker<WebhookJobData>(
   queueName,
   async job => {
     try {
@@ -157,8 +167,11 @@ export const worker = new Worker(
       console.log('worker:processing', { jobId: job.id, pageId: entry?.id })
       await upsertFromEntry(entry)
       console.log('worker:completed', { jobId: job.id })
-    } catch (err: any) {
-      console.error('worker:error', { jobId: job.id, err: err?.message })
+    } catch (err: unknown) {
+      console.error('worker:error', {
+        jobId: job.id,
+        err: err instanceof Error ? err.message : String(err),
+      })
       throw err
     }
   },
@@ -178,7 +191,10 @@ console.log('Webhook worker started')
   try {
     const rows = await db.select({ pageId: facebookConnections.pageId }).from(facebookConnections)
     console.log('worker:connections_snapshot', { count: rows.length, pageIds: rows.map(r => r.pageId).slice(0, 5) })
-  } catch (e: any) {
-    console.warn('worker:connections_snapshot_error', e?.message)
+  } catch (e: unknown) {
+    console.warn(
+      'worker:connections_snapshot_error',
+      e instanceof Error ? e.message : String(e),
+    )
   }
 })()

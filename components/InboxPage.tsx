@@ -52,9 +52,13 @@ export function InboxPage() {
       if (selectedIdRef.current === conversationId) {
         setMessages((prev) => [...prev, message])
       }
-      setConversations((prev) =>
-        prev.map((c) => (c.id === conversation.id ? conversation : c)),
-      )
+      setConversations((prev) => {
+        const exists = prev.some((c) => c.id === conversation.id)
+        if (exists) {
+          return prev.map((c) => (c.id === conversation.id ? conversation : c))
+        }
+        return [conversation, ...prev]
+      })
     }
 
     socket.on('message:new', handleMessageNew)

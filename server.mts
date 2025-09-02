@@ -1,6 +1,8 @@
 import { createServer } from "node:http";
 import next from "next";
 import { Server } from "socket.io";
+import Redis from "ioredis";
+import { createAdapter } from "@socket.io/redis-adapter";
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = "localhost";
@@ -13,6 +15,12 @@ app.prepare().then(() => {
   const httpServer = createServer(handler);
 
   const io = new Server(httpServer);
+
+  // Use Redis adapter so events from workers can reach connected clients
+  const redisUrl = process.env.REDIS_URL || "redis://localhost:6379/0";
+  const pubClient = new Redis(redisUrl);
+  const subClient = pubClient.duplicate();
+  io.adapter(createAdapter(pubClient, subClient));
 
   io.on("connection", (socket) => {
     console.log("a user connected: " + socket.id);
