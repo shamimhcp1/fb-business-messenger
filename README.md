@@ -152,10 +152,10 @@ npm run dev  # http://localhost:3000
 
 6) Start the worker
 
-- The worker is TypeScript (`worker/index.ts`). Run it with your preferred TS runner (e.g., `tsx`):
+- The worker is TypeScript (`worker/index.ts`):
 
 ```bash
-npx tsx worker/index.ts
+npm run worker
 ```
 
 7) Webhooks in local dev
@@ -163,9 +163,8 @@ npx tsx worker/index.ts
 - Expose your local server using `localtunnel` (or similar):
 
 ```bash
-npx localtunnel --port 3000 --subdomain your-sub
+npx localtunnel --port 3000 --subdomain fb-messenger
 # Configure Facebook App webhook URL to: https://your-sub.loca.lt/api/webhooks/meta
-```
 
 ## Storage Options
 

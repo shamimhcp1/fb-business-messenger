@@ -1,39 +1,41 @@
-import next from 'next'
-import http from 'http'
-import { Server } from 'socket.io'
-import { createAdapter } from '@socket.io/redis-adapter'
-import { redis } from '@/lib/redis'
+// server.ts
+import { createServer } from "node:http";
+import next from "next";
+import { Server } from "socket.io";
 
-const dev = process.env.NODE_ENV !== 'production'
-const app = next({ dev })
-const handle = app.getRequestHandler()
+const dev = process.env.NODE_ENV !== "production";
+const hostname = "localhost";
+const port = 3000;
+// when using middleware `hostname` and `port` must be provided below
+const app = next({ dev, hostname, port });
+const handler = app.getRequestHandler();
 
 async function main() {
-  await app.prepare()
-  const server = http.createServer((req, res) => handle(req, res))
+  await app.prepare();
 
-  const io = new Server(server, { cors: { origin: '*' } })
-  // Create a second Redis connection for pub/sub if needed; here we reuse and duplicate
-  const pubClient: any = redis.duplicate()
-  const subClient: any = redis.duplicate()
-  await pubClient.connect?.()
-  await subClient.connect?.()
-  io.adapter(createAdapter(pubClient, subClient))
+  const httpServer = createServer(handler);
 
-  io.on('connection', socket => {
-    socket.on('join', (rooms: string[]) => {
-      rooms.forEach(r => socket.join(r))
+  const io = new Server(httpServer);
+
+  io.on("connection", (socket) => {
+    socket.on("join", (rooms: string[]) => {
+      rooms.forEach((r) => socket.join(r));
+    });
+  });
+
+  httpServer
+    .once("error", (err) => {
+      console.error(err);
+      process.exit(1);
     })
-  })
-
-  const port = process.env.PORT ? Number(process.env.PORT) : 3000
-  server.listen(port, () => {
-    console.log(`Server ready on http://localhost:${port}`)
-  })
+    .listen(port, () => {
+      console.log(`> Server Ready on http://${hostname}:${port}`);
+    });
 }
 
-main().catch(err => {
-  console.error(err)
-  process.exit(1)
-})
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
+
 
