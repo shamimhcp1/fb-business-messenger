@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { io } from 'socket.io-client'
+import { socket } from "@/lib/socketClient";
 import type { Conversation, Message, ApiListResponse } from '@/lib/types'
 
 async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
@@ -17,7 +17,7 @@ export function InboxPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [text, setText] = useState('')
-  const socketRef = useRef<ReturnType<typeof io> | null>(null)
+  const socketRef = useRef<typeof socket | null>(null)
   const selectedIdRef = useRef<string | null>(null)
 
   useEffect(() => {
@@ -38,7 +38,6 @@ export function InboxPage() {
   }, [selectedId])
 
   useEffect(() => {
-    const socket = io()
     socketRef.current = socket
 
     const handleMessageNew = ({
@@ -62,7 +61,6 @@ export function InboxPage() {
 
     return () => {
       socket.off('message:new', handleMessageNew)
-      socket.disconnect()
     }
   }, [])
 
