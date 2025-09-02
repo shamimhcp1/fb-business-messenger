@@ -30,14 +30,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'invalid_signature' }, { status: 401 })
   }
 
-  let body: any
+  let body: unknown
   try {
-    body = JSON.parse(raw)
+    body = JSON.parse(raw) as Record<string, unknown>
   } catch {
     return NextResponse.json({ error: 'invalid_json' }, { status: 400 })
   }
 
-  const entries = body.entry || []
+  const entries = (body as { entry?: unknown[] }).entry || []
   // Temporary debug log to verify delivery (remove in production)
   try {
     const first = entries[0]

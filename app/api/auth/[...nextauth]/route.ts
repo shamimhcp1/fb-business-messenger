@@ -28,17 +28,27 @@ const handler = NextAuth({
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.userId = (user as any).id
-        token.tenantId = (user as any).tenantId
-        token.role = (user as any).role
+        const u = user as {
+          id: string
+          tenantId: string
+          role: string
+        }
+        token.userId = u.id
+        token.tenantId = u.tenantId
+        token.role = u.role
       }
       return token
     },
     async session({ session, token }) {
-      ;(session as any).userId = token.userId
-      ;(session as any).tenantId = token.tenantId
-      ;(session as any).role = token.role
-      return session
+      const s = session as typeof session & {
+        userId?: string
+        tenantId?: string
+        role?: string
+      }
+      s.userId = token.userId as string | undefined
+      s.tenantId = token.tenantId as string | undefined
+      s.role = token.role as string | undefined
+      return s
     },
   },
   secret: process.env.NEXTAUTH_SECRET,

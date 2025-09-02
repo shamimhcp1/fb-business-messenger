@@ -90,8 +90,10 @@ export async function GET(req: Request) {
       // Ignore "already subscribed" errors so DB writes are not rolled back by a Graph API 400.
       try {
         await subscribePage(p.id, p.access_token)
-      } catch (err: any) {
-        const msg = err?.response?.data?.error?.message || err?.message || ''
+      } catch (err: unknown) {
+        const msg =
+          (err as { response?: { data?: { error?: { message?: string } } }; message?: string })
+            .response?.data?.error?.message || (err as Error).message || ''
         if (!/already\s+subscribed/i.test(msg)) {
           throw err
         }
@@ -102,10 +104,11 @@ export async function GET(req: Request) {
     okUrl.search = ''
     okUrl.searchParams.set('ok', '1')
     return NextResponse.redirect(okUrl)
-  } catch (e: any) {
+  } catch (e: unknown) {
     const errUrl = new URL(connectionsUrl)
     errUrl.search = ''
-    errUrl.searchParams.set('error', e?.message || 'oauth_failed')
+    const msg = e instanceof Error ? e.message : 'oauth_failed'
+    errUrl.searchParams.set('error', msg)
     return NextResponse.redirect(errUrl)
   }
 }

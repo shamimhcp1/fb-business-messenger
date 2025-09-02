@@ -52,7 +52,11 @@ export async function subscribePage(pageId: string, pageAccessToken: string) {
   return data
 }
 
-export async function sendMessage(pageId: string, pageAccessToken: string, body: any) {
+export async function sendMessage(
+  pageId: string,
+  pageAccessToken: string,
+  body: Record<string, unknown>,
+) {
   const { data } = await axios.post(`${API}/${pageId}/messages`, body, {
     headers: { Authorization: `Bearer ${pageAccessToken}` },
   })
