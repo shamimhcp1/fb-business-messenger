@@ -1,10 +1,14 @@
-import path from 'path';
+import path from "path";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  outputFileTracingRoot: path.join(__dirname, '..'),
+  // Allow your LocalTunnel host(s) in DEV
+  allowedDevOrigins: ["fb-messenger.loca.lt", "*.loca.lt"],
+
+  outputFileTracingRoot: path.join(__dirname, ".."),
   experimental: {
     serverActions: {
+      // Keep this for Server Actions POSTs
       allowedOrigins: ["https://fb-messenger.loca.lt"],
     },
   },
