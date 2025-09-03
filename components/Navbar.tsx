@@ -11,6 +11,9 @@ export function Navbar() {
         </Link>
         <div className="ml-auto flex items-center gap-2">
           <Button variant="ghost" asChild>
+            <Link href="/">Home</Link>
+          </Button>
+          <Button variant="ghost" asChild>
             <Link href="/connections">Connections</Link>
           </Button>
           <ModeToggle />

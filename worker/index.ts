@@ -190,7 +190,7 @@ console.log('Webhook worker started')
 ;(async () => {
   try {
     const rows = await db.select({ pageId: facebookConnections.pageId }).from(facebookConnections)
-    console.log('worker:connections_snapshot', { count: rows.length, pageIds: rows.map(r => r.pageId).slice(0, 5) })
+    console.log('worker:connections_snapshot', { count: rows.length, pageIds: rows.map(r => r.pageId) })
   } catch (e: unknown) {
     console.warn(
       'worker:connections_snapshot_error',

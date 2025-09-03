@@ -9,17 +9,17 @@ export function HomePage() {
         Manage your Facebook messaging in one place.
       </p>
       <div className="flex gap-4">
-        <Link
-          href="/connections"
+        <a
+          href="/api/meta/login"
           className="inline-flex items-center px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700"
         >
-          Connect Page
-        </Link>
+          Connect Facebook Page
+        </a>
         <Link
-          href="/inbox"
+          href="/connections"
           className="inline-flex items-center px-4 py-2 rounded-md border hover:bg-gray-100"
         >
-          Go to Inbox
+          Go to Connections
         </Link>
       </div>
     </main>
