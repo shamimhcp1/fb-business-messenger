@@ -20,27 +20,38 @@ async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
   return (await res.json()) as T
 }
 
-export function InboxPage() {
+export function InboxPage({
+  tenantId,
+  pageId,
+}: {
+  tenantId: string
+  pageId: string
+}) {
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [text, setText] = useState('')
   const socketRef = useRef<typeof socket | null>(null)
   const selectedIdRef = useRef<string | null>(null)
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
-    fetchJson<ApiListResponse<Conversation>>('/api/inbox/conversations')
+    if (!tenantId || !pageId) return
+    fetchJson<ApiListResponse<Conversation>>(
+      `/api/inbox/conversations?tenantId=${tenantId}&pageId=${pageId}`,
+    )
       .then((data) => setConversations(data.data))
       .catch(() => setConversations([]))
-  }, [])
+  }, [tenantId, pageId])
 
   useEffect(() => {
     if (!selectedId) return
-    fetchJson<ApiListResponse<Message>>(`/api/inbox/conversations/${selectedId}/messages`)
+    fetchJson<ApiListResponse<Message>>(
+      `/api/inbox/conversations/${selectedId}/messages?tenantId=${tenantId}&pageId=${pageId}`,
+    )
       .then((data) => setMessages(data.data))
       .catch(() => setMessages([]))
-  }, [selectedId])
+  }, [selectedId, tenantId, pageId])
 
   useEffect(() => {
     selectedIdRef.current = selectedId
@@ -80,7 +91,9 @@ export function InboxPage() {
           if (!conversation.name || !conversation.profilePic) {
             const { data } = await fetchJson<
               ApiItemResponse<{ pageTokenEnc: string }>
-            >(`/api/inbox/conversations/${conversation.id}/token`)
+            >(
+              `/api/inbox/conversations/${conversation.id}/token?tenantId=${tenantId}&pageId=${pageId}`,
+            )
             const token = decrypt(unpack(data.pageTokenEnc))
             const profile = await getUserProfile(conversation.psid, token)
             setConversations((prev) =>
@@ -103,10 +116,10 @@ export function InboxPage() {
 
     socket.on('message:new', handleMessageNew)
 
-    return () => {
-      socket.off('message:new', handleMessageNew)
-    }
-  }, [])
+      return () => {
+        socket.off('message:new', handleMessageNew)
+      }
+  }, [tenantId, pageId])
 
   useEffect(() => {
     if (!socketRef.current || conversations.length === 0) return
@@ -124,7 +137,7 @@ export function InboxPage() {
   const sendMessage = async () => {
     if (!selectedId || !text.trim()) return
     await fetchJson<{ message: Message }>(
-      `/api/inbox/conversations/${selectedId}/messages`,
+      `/api/inbox/conversations/${selectedId}/messages?tenantId=${tenantId}&pageId=${pageId}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

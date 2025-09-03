@@ -1,6 +1,20 @@
 import Link from 'next/link'
+import { db } from '@/db'
+import { facebookConnections } from '@/db/schema'
+import { eq } from 'drizzle-orm'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 
-export function ConnectionsPage() {
+export async function ConnectionsPage() {
+  const session = await getServerSession(authOptions)
+  const tenantId = session?.tenantId
+  const connections = tenantId
+    ? await db
+        .select()
+        .from(facebookConnections)
+        .where(eq(facebookConnections.tenantId, tenantId))
+    : []
+
   return (
     <main className="p-6 max-w-3xl mx-auto space-y-4">
       <h1 className="text-xl font-semibold">Connections</h1>
@@ -13,9 +27,25 @@ export function ConnectionsPage() {
       >
         Connect Facebook Page
       </a>
-      <div>
-        <Link className="underline" href="/inbox">Go to Inbox</Link>
-      </div>
+      <ul className="space-y-2">
+        {connections.map((conn) => (
+          <li
+            key={conn.pageId}
+            className="flex items-center justify-between border rounded p-2"
+          >
+            <div>
+              <div className="font-medium">{conn.pageName}</div>
+              <div className="text-xs text-gray-500">Tenant: {conn.tenantId}</div>
+            </div>
+            <Link
+              className="underline"
+              href={`/inbox?tenantId=${conn.tenantId}&pageId=${conn.pageId}`}
+            >
+              Inbox
+            </Link>
+          </li>
+        ))}
+      </ul>
     </main>
   )
 }
