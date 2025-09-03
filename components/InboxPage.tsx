@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react'
 import { socket } from "@/lib/socketClient";
 import type { Conversation, Message, ApiListResponse } from '@/lib/types'
 import Image from 'next/image';
+import { getUserProfile } from "@/lib/meta";
+import { decrypt, unpack } from '@/lib/crypto';
 
 async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(url, options)
@@ -20,6 +22,7 @@ export function InboxPage() {
   const [text, setText] = useState('')
   const socketRef = useRef<typeof socket | null>(null)
   const selectedIdRef = useRef<string | null>(null)
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     fetchJson<ApiListResponse<Conversation>>('/api/inbox/conversations')
@@ -39,6 +42,10 @@ export function InboxPage() {
   }, [selectedId])
 
   useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  useEffect(() => {
     socketRef.current = socket
 
     const handleMessageNew = ({
@@ -56,6 +63,12 @@ export function InboxPage() {
       setConversations((prev) => {
         const exists = prev.some((c) => c.id === conversation.id)
         if (exists) {
+          async function fetchProfile() {
+            const token = decrypt(unpack(conversation.pageTokenEnc));
+            // const profile = await getUserProfile(conversation.psid, token);
+          }
+          fetchProfile();
+          
           return prev.map((c) => (c.id === conversation.id ? conversation : c))
         }
         return [conversation, ...prev]
@@ -108,7 +121,9 @@ export function InboxPage() {
                 type="button"
                 onClick={() => setSelectedId(c.id)}
                 className={`block w-full text-left px-2 py-1 rounded ${
-                  selectedId === c.id ? 'bg-gray-200 dark:bg-gray-700' : 'hover:bg-gray-100'
+                  selectedId === c.id
+                    ? "bg-gray-200 dark:bg-gray-700"
+                    : "hover:bg-gray-100"
                 }`}
               >
                 <span className="flex items-center gap-2">
@@ -138,29 +153,30 @@ export function InboxPage() {
                 <div
                   key={m.id}
                   className={`flex ${
-                    m.direction === 'outbound' ? 'justify-end' : 'justify-start'
+                    m.direction === "outbound" ? "justify-end" : "justify-start"
                   }`}
                 >
                   <div className="px-2 py-1 rounded bg-gray-200 dark:bg-gray-700 flex items-end gap-1">
                     {m.text}
-                    {m.direction === 'outbound' && (
+                    {m.direction === "outbound" && (
                       <span
                         className={`text-xs ${
-                          m.readAt ? 'text-blue-500' : 'text-gray-500'
+                          m.readAt ? "text-blue-500" : "text-gray-500"
                         }`}
                       >
-                        {m.readAt ? '✓✓' : '✓'}
+                        {m.readAt ? "✓✓" : "✓"}
                       </span>
                     )}
                   </div>
                 </div>
               ))}
+              <div ref={messagesEndRef} />
             </div>
             <div className="flex gap-2">
               <input
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+                onKeyDown={(e) => e.key === "Enter" && sendMessage()}
                 className="flex-1 border dark:border-gray-600 rounded px-2 py-1"
                 placeholder="Type a message"
               />
@@ -179,5 +195,5 @@ export function InboxPage() {
         )}
       </section>
     </main>
-  )
+  );
 }
