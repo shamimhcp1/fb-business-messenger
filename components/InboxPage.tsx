@@ -71,27 +71,27 @@ export function InboxPage() {
 
       // Fetch profile info if missing
       (async () => {
-        try {
-          if (!conversation.name || !conversation.profilePic) {
-            const token = decrypt(unpack(conversation.pageTokenEnc));
-            const profile = await getUserProfile(conversation.psid, token);
-            setConversations((prev) =>
-              prev.map((c) =>
-                c.id === conversation.id
-                  ? {
-                      ...c,
-                      name: profile.name,
-                      profilePic: profile.picture?.data?.url,
-                    }
-                  : c
-              )
-            );
+          try {
+            if ((!conversation.name || !conversation.profilePic) && conversation.pageTokenEnc) {
+              const token = decrypt(unpack(conversation.pageTokenEnc));
+              const profile = await getUserProfile(conversation.psid, token);
+              setConversations((prev) =>
+                prev.map((c) =>
+                  c.id === conversation.id
+                    ? {
+                        ...c,
+                        name: profile.name,
+                        profilePic: profile.picture?.data?.url,
+                      }
+                    : c
+                )
+              );
+            }
+          } catch (err) {
+            console.error("Failed to fetch profile", err);
           }
-        } catch (err) {
-          console.error("Failed to fetch profile", err);
-        }
-      })();
-    }
+        })();
+      }
 
     socket.on('message:new', handleMessageNew)
 
