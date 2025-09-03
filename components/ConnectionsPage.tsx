@@ -5,14 +5,18 @@ import { eq } from 'drizzle-orm'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 
-export async function ConnectionsPage() {
+interface ConnectionsPageProps {
+  tenantId?: string
+}
+
+export async function ConnectionsPage({ tenantId }: ConnectionsPageProps) {
   const session = await getServerSession(authOptions)
-  const tenantId = session?.tenantId
-  const connections = tenantId
+  const effectiveTenantId = tenantId ?? session?.tenantId
+  const connections = effectiveTenantId
     ? await db
         .select()
         .from(facebookConnections)
-        .where(eq(facebookConnections.tenantId, tenantId))
+        .where(eq(facebookConnections.tenantId, effectiveTenantId))
     : []
 
   return (
