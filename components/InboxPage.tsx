@@ -45,6 +45,7 @@ export function InboxPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // WebSocket setup and cleanup on mount/unmount
   useEffect(() => {
     socketRef.current = socket
 
@@ -61,18 +62,35 @@ export function InboxPage() {
         setMessages((prev) => [...prev, message])
       }
       setConversations((prev) => {
-        const exists = prev.some((c) => c.id === conversation.id)
+        const exists = prev.some((c) => c.id === conversation.id);
         if (exists) {
-          async function fetchProfile() {
-            const token = decrypt(unpack(conversation.pageTokenEnc));
-            // const profile = await getUserProfile(conversation.psid, token);
-          }
-          fetchProfile();
-          
-          return prev.map((c) => (c.id === conversation.id ? conversation : c))
+          return prev.map((c) => (c.id === conversation.id ? conversation : c));
         }
-        return [conversation, ...prev]
-      })
+        return [conversation, ...prev];
+      });
+
+      // Fetch profile info if missing
+      (async () => {
+        try {
+          if (!conversation.name || !conversation.profilePic) {
+            const token = decrypt(unpack(conversation.pageTokenEnc));
+            const profile = await getUserProfile(conversation.psid, token);
+            setConversations((prev) =>
+              prev.map((c) =>
+                c.id === conversation.id
+                  ? {
+                      ...c,
+                      name: profile.name,
+                      profilePic: profile.picture?.data?.url,
+                    }
+                  : c
+              )
+            );
+          }
+        } catch (err) {
+          console.error("Failed to fetch profile", err);
+        }
+      })();
     }
 
     socket.on('message:new', handleMessageNew)
