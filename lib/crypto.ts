@@ -36,7 +36,10 @@ export function pack(enc: { iv: string; tag: string; data: string }) {
   return Buffer.from(JSON.stringify(enc)).toString('base64')
 }
 
-export function unpack(blob: string) {
+export function unpack(blob: string | null | undefined) {
+  if (!blob) {
+    throw new TypeError('Cannot unpack empty payload')
+  }
   return JSON.parse(Buffer.from(blob, 'base64').toString('utf8')) as {
     iv: string
     tag: string

@@ -7,7 +7,6 @@ export interface Conversation {
   unreadCount: number;
   assigneeUserId: string | null;
   status: string;
-  pageTokenEnc: string; // encrypted page access token
   name?: string;
   profilePic?: string;
 }
