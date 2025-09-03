@@ -2,7 +2,12 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { socket } from "@/lib/socketClient";
-import type { Conversation, Message, ApiListResponse } from '@/lib/types'
+import type {
+  Conversation,
+  Message,
+  ApiListResponse,
+  ApiItemResponse,
+} from '@/lib/types'
 import Image from 'next/image';
 import { getUserProfile } from "@/lib/meta";
 import { decrypt, unpack } from '@/lib/crypto';
@@ -70,28 +75,31 @@ export function InboxPage() {
       });
 
       // Fetch profile info if missing
-      (async () => {
-          try {
-            if ((!conversation.name || !conversation.profilePic) && conversation.pageTokenEnc) {
-              const token = decrypt(unpack(conversation.pageTokenEnc));
-              const profile = await getUserProfile(conversation.psid, token);
-              setConversations((prev) =>
-                prev.map((c) =>
-                  c.id === conversation.id
-                    ? {
-                        ...c,
-                        name: profile.name,
-                        profilePic: profile.picture?.data?.url,
-                      }
-                    : c
-                )
-              );
-            }
-          } catch (err) {
-            console.error("Failed to fetch profile", err);
+      ;(async () => {
+        try {
+          if (!conversation.name || !conversation.profilePic) {
+            const { data } = await fetchJson<
+              ApiItemResponse<{ pageTokenEnc: string }>
+            >(`/api/inbox/conversations/${conversation.id}/token`)
+            const token = decrypt(unpack(data.pageTokenEnc))
+            const profile = await getUserProfile(conversation.psid, token)
+            setConversations((prev) =>
+              prev.map((c) =>
+                c.id === conversation.id
+                  ? {
+                      ...c,
+                      name: profile.name,
+                      profilePic: profile.picture?.data?.url,
+                    }
+                  : c,
+              ),
+            )
           }
-        })();
-      }
+        } catch (err) {
+          console.error('Failed to fetch profile', err)
+        }
+      })()
+    }
 
     socket.on('message:new', handleMessageNew)
 
