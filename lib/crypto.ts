@@ -3,6 +3,7 @@ import {
   createCipheriv,
   createDecipheriv,
   pbkdf2Sync,
+  scryptSync,
 } from 'crypto'
 
 const pass = process.env.ENCRYPTION_PASS || 'change-me'
@@ -10,6 +11,11 @@ const salt = 'fb-messenger-salt'
 
 function getKey() {
   return pbkdf2Sync(pass, salt, 100_000, 32, 'sha256')
+}
+
+function getLegacyKey() {
+  // Support tokens encrypted with the previous scrypt-based scheme
+  return scryptSync(pass, salt, 32)
 }
 
 export function encrypt(plain: string) {
@@ -26,16 +32,25 @@ export function encrypt(plain: string) {
 }
 
 export function decrypt(payload: { iv: string; tag: string; data: string }) {
-  const key = getKey()
   const iv = Buffer.from(payload.iv, 'base64')
   const tag = Buffer.from(payload.tag, 'base64')
-  const decipher = createDecipheriv('aes-256-gcm', key, iv)
-  decipher.setAuthTag(tag)
-  const decrypted = Buffer.concat([
-    decipher.update(Buffer.from(payload.data, 'base64')),
-    decipher.final(),
-  ])
-  return decrypted.toString('utf8')
+  const data = Buffer.from(payload.data, 'base64')
+
+  const attempt = (key: Buffer) => {
+    const decipher = createDecipheriv('aes-256-gcm', key, iv)
+    decipher.setAuthTag(tag)
+    return Buffer.concat([decipher.update(data), decipher.final()])
+  }
+
+  try {
+    return attempt(getKey()).toString('utf8')
+  } catch (err) {
+    try {
+      return attempt(getLegacyKey()).toString('utf8')
+    } catch {
+      throw err
+    }
+  }
 }
 
 export function pack(enc: { iv: string; tag: string; data: string }) {
