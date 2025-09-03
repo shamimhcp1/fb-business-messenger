@@ -13,9 +13,6 @@ export function Navbar() {
           <Button variant="ghost" asChild>
             <Link href="/connections">Connections</Link>
           </Button>
-          <Button variant="ghost" asChild>
-            <Link href="/inbox">Inbox</Link>
-          </Button>
           <ModeToggle />
         </div>
       </div>
