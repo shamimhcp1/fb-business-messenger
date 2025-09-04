@@ -16,6 +16,9 @@ export function Navbar() {
           <Button variant="ghost" asChild>
             <Link href="/connections">Connections</Link>
           </Button>
+          <Button variant="default" asChild>
+            <Link href="/login">Login</Link>
+          </Button>
           <ModeToggle />
         </div>
       </div>
