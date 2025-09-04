@@ -2,22 +2,16 @@ import Link from 'next/link'
 import { db } from '@/db'
 import { facebookConnections } from '@/db/schema'
 import { eq } from 'drizzle-orm'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/lib/auth'
 
 interface ConnectionsPageProps {
-  tenantId?: string
+  tenantId: string
 }
 
 export async function ConnectionsPage({ tenantId }: ConnectionsPageProps) {
-  const session = await getServerSession(authOptions)
-  const effectiveTenantId = tenantId ?? session?.tenantId
-  const connections = effectiveTenantId
-    ? await db
-        .select()
-        .from(facebookConnections)
-        .where(eq(facebookConnections.tenantId, effectiveTenantId))
-    : []
+  const connections = await db
+    .select()
+    .from(facebookConnections)
+    .where(eq(facebookConnections.tenantId, tenantId))
 
   return (
     <main className="p-6 max-w-3xl mx-auto space-y-4">

@@ -1,4 +1,4 @@
-import { NextAuthOptions } from 'next-auth'
+import { NextAuthOptions, Session } from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 import { db } from '@/db'
 import { users } from '@/db/schema'
@@ -40,7 +40,7 @@ export const authOptions: NextAuthOptions = {
       return token
     },
     async session({ session, token }) {
-      const s = session as typeof session & {
+      const s = session as Session & {
         userId?: string
         tenantId?: string
         role?: string
@@ -48,6 +48,11 @@ export const authOptions: NextAuthOptions = {
       s.userId = token.userId as string | undefined
       s.tenantId = token.tenantId as string | undefined
       s.role = token.role as string | undefined
+      if (s.user) {
+        if (s.userId) s.user.id = s.userId
+        if (s.tenantId) s.user.tenantId = s.tenantId
+        if (s.role) s.user.role = s.role
+      }
       return s
     },
   },
