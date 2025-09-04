@@ -26,7 +26,7 @@ export async function ConnectionsPage({ tenantId }: ConnectionsPageProps) {
         href="/api/meta/login"
         className="inline-flex items-center px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700"
       >
-        Connect Facebook Pages
+        {connections.length > 0 ? "Reconnect" : "Connect"} Facebook Pages
       </a>
       <ul className="space-y-2">
         {connections.map((conn) => (

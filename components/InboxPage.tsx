@@ -11,6 +11,7 @@ import type {
 import Image from 'next/image';
 import { getUserProfile } from "@/lib/meta";
 import { decrypt, unpack } from '@/lib/crypto';
+import { Badge } from '@/components/ui/badge';
 
 async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(url, options)
@@ -142,67 +143,75 @@ export function InboxPage({
 
   return (
     <main className="p-6">
-      <h1 className="text-xl font-semibold mb-4">{pageName}</h1>
+      <h1 className="text-xl font-semibold mb-4 pb-4 border-b">
+        {pageName} <Badge variant={"outline"}>{conversations.length}</Badge>
+      </h1>
       <div className="flex gap-4">
         <aside className="w-64 border-r">
-          <h2 className="font-semibold mb-2">Conversations</h2>
-          <ul className="space-y-1">
-            {conversations.map((c) => (
-              <li key={c.id}>
-                <button
-                  type="button"
-                  onClick={() => setSelectedId(c.id)}
-                  className={`block w-full text-left px-2 py-1 rounded ${
-                    selectedId === c.id
-                      ? "bg-gray-200 dark:bg-gray-700"
-                      : "hover:bg-gray-100"
-                  }`}
-                >
-                  <span className="flex items-center gap-2">
-                    {c.profilePic ? (
-                      <Image
-                        src={c.profilePic}
-                        alt={c.name || c.psid}
-                        className="w-6 h-6 rounded-full"
-                        width={24}
-                        height={24}
-                      />
-                    ) : (
-                      <span className="w-6 h-6 rounded-full bg-gray-300" />
-                    )}
-                    <span>{c.name || c.psid}</span>
-                  </span>
-                </button>
-              </li>
-            ))}
+          <ul className="space-y-1 h-[75vh]">
+            {conversations.length > 0 &&
+              conversations.map((c) => (
+                <li key={c.id}>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedId(c.id)}
+                    className={`block w-full text-left px-2 py-1 rounded ${
+                      selectedId === c.id
+                        ? "bg-gray-200 dark:bg-gray-700"
+                        : "hover:bg-gray-100"
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      {c.profilePic ? (
+                        <Image
+                          src={c.profilePic}
+                          alt={c.name || c.psid}
+                          className="w-6 h-6 rounded-full"
+                          width={24}
+                          height={24}
+                        />
+                      ) : (
+                        <span className="w-6 h-6 rounded-full bg-gray-300" />
+                      )}
+                      <span>{c.name || c.psid}</span>
+                    </span>
+                  </button>
+                </li>
+              ))}
+
+            {conversations.length === 0 && (
+              <li className='text-muted-foreground'>No conversations yet!</li>
+            )}
           </ul>
         </aside>
         <section className="flex-1 flex flex-col">
           {selectedId ? (
             <>
-              <div className="flex-1 overflow-y-auto mb-4 space-y-2 max-h-[75vh]">
+              <div className="flex-1 overflow-y-auto mb-4 space-y-2 h-[75vh]">
                 {messages.map((m) => (
-                <div
-                  key={m.id}
-                  className={`flex ${
-                    m.direction === "outbound" ? "justify-end" : "justify-start"
-                  }`}
-                >
-                  <div className="px-2 py-1 rounded bg-gray-200 dark:bg-gray-700 flex items-end gap-1">
-                    {m.text}
-                    {m.direction === "outbound" && (
-                      <span
-                        className={`text-xs ${
-                          m.readAt ? "text-blue-500" : "text-gray-500"
-                        }`}
-                      >
-                        {m.readAt ? "✓✓" : "✓"}
-                      </span>
-                    )}
+                  <div
+                    key={m.id}
+                    className={`flex ${
+                      m.direction === "outbound"
+                        ? "justify-end"
+                        : "justify-start"
+                    }`}
+                  >
+                    <div className="px-2 py-1 rounded bg-gray-200 dark:bg-gray-700 flex items-end gap-1">
+                      {m.text}
+                      {m.direction === "outbound" && (
+                        <span
+                          className={`text-xs ${
+                            m.readAt ? "text-blue-500" : "text-gray-500"
+                          }`}
+                        >
+                          {m.readAt ? "✓✓" : "✓"}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
-              <div ref={messagesEndRef} />
+                ))}
+                <div ref={messagesEndRef} />
               </div>
               <div className="flex gap-2 items-center">
                 {selectedConversation && (
@@ -210,7 +219,9 @@ export function InboxPage({
                     {selectedConversation.profilePic ? (
                       <Image
                         src={selectedConversation.profilePic}
-                        alt={selectedConversation.name || selectedConversation.psid}
+                        alt={
+                          selectedConversation.name || selectedConversation.psid
+                        }
                         className="w-6 h-6 rounded-full"
                         width={24}
                         height={24}
@@ -239,8 +250,10 @@ export function InboxPage({
                 </button>
               </div>
             </>
-          ) : (
-            <p>Select a conversation to view messages.</p>
+          ) : conversations.length > 0 && (
+            <p className="text-muted-foreground">
+              Select a conversation to view messages.
+            </p>
           )}
         </section>
       </div>

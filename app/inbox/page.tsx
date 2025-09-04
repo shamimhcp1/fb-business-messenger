@@ -14,7 +14,7 @@ export default async function Page({
   const session = await getServerSession(authOptions)
   const tenantId = session?.tenantId
   if (!tenantId) {
-    redirect('/login')
+    redirect("/login");
   }
 
   const { pageId } = await searchParams
