@@ -1,11 +1,11 @@
 import { InboxPage } from '@/components/InboxPage'
 
-export default function Page({
+export default async function Page({
   searchParams,
 }: {
-  searchParams: { tenantId?: string; pageId?: string }
+  searchParams: Promise<{ tenantId?: string; pageId?: string }>
 }) {
-  const { tenantId, pageId } = searchParams
+  const { tenantId, pageId } = await searchParams
   if (!tenantId || !pageId) {
     return <div className="p-6">Missing pageId or tenantId</div>
   }
