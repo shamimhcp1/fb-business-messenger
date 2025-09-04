@@ -1,13 +1,10 @@
 import { ConnectionsPage } from '@/components/ConnectionsPage'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
 
-interface PageProps {
-  searchParams: Promise<{
-    tenantId?: string
-  }>
-}
-
-export default async function Page({ searchParams }: PageProps) {
-  const { tenantId } = await searchParams
+export default async function Page() {
+  const session = await getServerSession(authOptions)
+  const tenantId = session?.tenantId
 
   if (!tenantId) {
     return <div className="p-6">Missing tenantId</div>;
