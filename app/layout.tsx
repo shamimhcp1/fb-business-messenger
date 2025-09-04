@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
-import "@/app/globals.css";
+import "@/styles/globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Navbar } from "@/components/Navbar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
 
 export const metadata: Metadata = {
   title: "FB Business Messenger",
@@ -24,10 +26,19 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <Navbar />
-            <div className="container min-h-screen mx-auto mt-4 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
-              {children}
-            </div>
+            <SidebarProvider>
+              <Navbar />
+              <div className="container min-h-screen mx-auto mt-4 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
+                {children}
+              </div>
+            </SidebarProvider>
+            {/* <SidebarProvider>
+              <AppSidebar />
+              <main>
+                <SidebarTrigger />
+                {children}
+              </main>
+            </SidebarProvider> */}
           </ThemeProvider>
         </body>
       </html>

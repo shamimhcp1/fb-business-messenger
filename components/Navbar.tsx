@@ -1,8 +1,15 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ModeToggle } from "@/components/ModeToggle"
+import { NavUser } from "./nav-user";
 
 export function Navbar() {
+
+  const user = {
+    name: "Shamim",
+    email: "shamimhcp@gmail.com",
+    avatar: "https://i.pravatar.cc/150?img=4",
+  };
   return (
     <nav className="border-b bg-yellow-300 dark:bg-yellow-600">
       <div className="container mx-auto flex h-14 items-center px-4">
@@ -19,6 +26,7 @@ export function Navbar() {
           <Button variant="default" asChild>
             <Link href="/login">Login</Link>
           </Button>
+          <NavUser user={user} />
           <ModeToggle />
         </div>
       </div>
