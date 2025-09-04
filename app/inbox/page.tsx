@@ -2,16 +2,26 @@ import { InboxPage } from '@/components/InboxPage'
 import { db } from '@/db'
 import { facebookConnections } from '@/db/schema'
 import { and, eq } from 'drizzle-orm'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { redirect } from 'next/navigation'
 
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ tenantId?: string; pageId?: string }>
+  searchParams: Promise<{ pageId?: string }>
 }) {
-  const { tenantId, pageId } = await searchParams
-  if (!tenantId || !pageId) {
-    return <div className="p-6">Missing pageId or tenantId</div>
+  const session = await getServerSession(authOptions)
+  const tenantId = session?.tenantId
+  if (!tenantId) {
+    redirect('/login')
   }
+
+  const { pageId } = await searchParams
+  if (!pageId) {
+    return <div className="p-6">Missing pageId</div>
+  }
+
   const conn = await db
     .select({ pageName: facebookConnections.pageName })
     .from(facebookConnections)
