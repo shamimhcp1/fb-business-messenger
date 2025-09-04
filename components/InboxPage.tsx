@@ -23,9 +23,11 @@ async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
 export function InboxPage({
   tenantId,
   pageId,
+  pageName,
 }: {
   tenantId: string
   pageId: string
+  pageName: string
 }) {
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -149,46 +151,50 @@ export function InboxPage({
     })
   }
 
+  const selectedConversation = conversations.find((c) => c.id === selectedId);
+
   return (
-    <main className="p-6 flex gap-4">
-      <aside className="w-64 border-r">
-        <h2 className="font-semibold mb-2">Conversations</h2>
-        <ul className="space-y-1">
-          {conversations.map((c) => (
-            <li key={c.id}>
-              <button
-                type="button"
-                onClick={() => setSelectedId(c.id)}
-                className={`block w-full text-left px-2 py-1 rounded ${
-                  selectedId === c.id
-                    ? "bg-gray-200 dark:bg-gray-700"
-                    : "hover:bg-gray-100"
-                }`}
-              >
-                <span className="flex items-center gap-2">
-                  {c.profilePic ? (
-                    <Image
-                      src={c.profilePic}
-                      alt={c.name || c.psid}
-                      className="w-6 h-6 rounded-full"
-                      width={24}
-                      height={24}
-                    />
-                  ) : (
-                    <span className="w-6 h-6 rounded-full bg-gray-300" />
-                  )}
-                  <span>{c.name || c.psid}</span>
-                </span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      </aside>
-      <section className="flex-1 flex flex-col">
-        {selectedId ? (
-          <>
-            <div className="flex-1 overflow-y-auto mb-4 space-y-2 max-h-[75vh]">
-              {messages.map((m) => (
+    <main className="p-6">
+      <h1 className="text-xl font-semibold mb-4">{pageName}</h1>
+      <div className="flex gap-4">
+        <aside className="w-64 border-r">
+          <h2 className="font-semibold mb-2">Conversations</h2>
+          <ul className="space-y-1">
+            {conversations.map((c) => (
+              <li key={c.id}>
+                <button
+                  type="button"
+                  onClick={() => setSelectedId(c.id)}
+                  className={`block w-full text-left px-2 py-1 rounded ${
+                    selectedId === c.id
+                      ? "bg-gray-200 dark:bg-gray-700"
+                      : "hover:bg-gray-100"
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    {c.profilePic ? (
+                      <Image
+                        src={c.profilePic}
+                        alt={c.name || c.psid}
+                        className="w-6 h-6 rounded-full"
+                        width={24}
+                        height={24}
+                      />
+                    ) : (
+                      <span className="w-6 h-6 rounded-full bg-gray-300" />
+                    )}
+                    <span>{c.name || c.psid}</span>
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </aside>
+        <section className="flex-1 flex flex-col">
+          {selectedId ? (
+            <>
+              <div className="flex-1 overflow-y-auto mb-4 space-y-2 max-h-[75vh]">
+                {messages.map((m) => (
                 <div
                   key={m.id}
                   className={`flex ${
@@ -210,29 +216,47 @@ export function InboxPage({
                 </div>
               ))}
               <div ref={messagesEndRef} />
-            </div>
-            <div className="flex gap-2">
-              <input
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                className="flex-1 border dark:border-gray-600 rounded px-2 py-1"
-                placeholder="Type a message"
-              />
-              <button
-                type="button"
-                onClick={sendMessage}
-                className="px-3 py-1 rounded bg-blue-600 text-white disabled:opacity-50"
-                disabled={!text.trim()}
-              >
-                Send
-              </button>
-            </div>
-          </>
-        ) : (
-          <p>Select a conversation to view messages.</p>
-        )}
-      </section>
+              </div>
+              <div className="flex gap-2 items-center">
+                {selectedConversation && (
+                  <div className="flex items-center gap-2 flex-1 border dark:border-gray-600 rounded px-2 py-1">
+                    {selectedConversation.profilePic ? (
+                      <Image
+                        src={selectedConversation.profilePic}
+                        alt={selectedConversation.name || selectedConversation.psid}
+                        className="w-6 h-6 rounded-full"
+                        width={24}
+                        height={24}
+                      />
+                    ) : (
+                      <span className="w-6 h-6 rounded-full bg-gray-300" />
+                    )}
+                    <input
+                      value={text}
+                      onChange={(e) => setText(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+                      className="flex-1 outline-none bg-transparent"
+                      placeholder={`Message ${
+                        selectedConversation.name || selectedConversation.psid
+                      }`}
+                    />
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={sendMessage}
+                  className="px-3 py-1 rounded bg-blue-600 text-white disabled:opacity-50"
+                  disabled={!text.trim()}
+                >
+                  Send
+                </button>
+              </div>
+            </>
+          ) : (
+            <p>Select a conversation to view messages.</p>
+          )}
+        </section>
+      </div>
     </main>
   );
 }
