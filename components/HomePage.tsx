@@ -24,11 +24,11 @@ export function HomePage() {
               href="/api/meta/login"
               className="inline-flex items-center px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700"
             >
-              Connect Facebook Page
+              Connect Facebook Pages
             </a>
             <Link
               href="/connections"
-              className="inline-flex items-center px-4 py-2 rounded-md border hover:bg-gray-100"
+              className="inline-flex items-center px-4 py-2 rounded-md border hover:bg-gray-100 dark:hover:text-gray-800"
             >
               Go to Connections
             </Link>
