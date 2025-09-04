@@ -78,6 +78,7 @@ Required (server):
 - `NEXTAUTH_SECRET` – NextAuth secret
 - `ENCRYPTION_PASS` – symmetric passphrase used to derive key for token encryption
 - `NEXT_PUBLIC_BASE_URL` – site origin (used for OAuth redirect)
+- `AUTH_TRUST_HOST` – set to `true` when using tunnels or reverse proxies in development
 
 Meta (Facebook):
 
@@ -111,6 +112,7 @@ REDIS_URL=redis://localhost:6379/0
 NEXTAUTH_SECRET=change-me
 ENCRYPTION_PASS=change-me
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
+AUTH_TRUST_HOST=true
 META_APP_ID=...
 META_APP_SECRET=...
 META_VERIFY_TOKEN=...
@@ -165,6 +167,9 @@ npm run worker
 ```bash
 npx localtunnel --port 3000 --subdomain fb-messenger
 # Configure Facebook App webhook URL to: https://your-sub.loca.lt/api/webhooks/meta
+```
+
+If you access the app via the tunnel URL, ensure `AUTH_TRUST_HOST=true` is set so NextAuth accepts the external host.
 
 ## Storage Options
 
