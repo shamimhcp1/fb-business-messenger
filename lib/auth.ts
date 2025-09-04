@@ -56,5 +56,6 @@ export const authOptions: NextAuthOptions = {
       return s
     },
   },
+  trustHost: process.env.AUTH_TRUST_HOST === 'true' || process.env.NODE_ENV !== 'production',
   secret: process.env.NEXTAUTH_SECRET,
 }
