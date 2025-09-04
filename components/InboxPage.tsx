@@ -141,34 +141,34 @@ export function InboxPage({
   const selectedConversation = conversations.find((c) => c.id === selectedId);
 
   return (
-    <main className="tw-p-6">
-      <h1 className="tw-text-xl tw-font-semibold tw-mb-4">{pageName}</h1>
-      <div className="tw-flex tw-gap-4">
-        <aside className="tw-w-64 tw-border-r">
-          <h2 className="tw-font-semibold tw-mb-2">Conversations</h2>
-          <ul className="tw-space-y-1">
+    <main className="tw-:p-6">
+      <h1 className="tw-:text-xl tw-:font-semibold tw-:mb-4">{pageName}</h1>
+      <div className="tw-:flex tw-:gap-4">
+        <aside className="tw-:w-64 tw-:border-r">
+          <h2 className="tw-:font-semibold tw-:mb-2">Conversations</h2>
+          <ul className="tw-:space-y-1">
             {conversations.map((c) => (
               <li key={c.id}>
                 <button
                   type="button"
                   onClick={() => setSelectedId(c.id)}
-                  className={`tw-block tw-w-full tw-text-left tw-px-2 tw-py-1 tw-rounded ${
+                  className={`tw-:block tw-:w-full tw-:text-left tw-:px-2 tw-:py-1 tw-:rounded ${
                     selectedId === c.id
-                      ? "tw-bg-gray-200 dark:tw-bg-gray-700"
-                      : "hover:tw-bg-gray-100"
+                      ? "tw-:bg-gray-200 dark:tw-:bg-gray-700"
+                      : "hover:tw-:bg-gray-100"
                   }`}
                 >
-                  <span className="tw-flex tw-items-center tw-gap-2">
+                  <span className="tw-:flex tw-:items-center tw-:gap-2">
                     {c.profilePic ? (
                       <Image
                         src={c.profilePic}
                         alt={c.name || c.psid}
-                        className="tw-w-6 tw-h-6 tw-rounded-full"
+                        className="tw-:w-6 tw-:h-6 tw-:rounded-full"
                         width={24}
                         height={24}
                       />
                     ) : (
-                      <span className="tw-w-6 tw-h-6 tw-rounded-full tw-bg-gray-300" />
+                      <span className="tw-:w-6 tw-:h-6 tw-:rounded-full tw-:bg-gray-300" />
                     )}
                     <span>{c.name || c.psid}</span>
                   </span>
@@ -177,23 +177,23 @@ export function InboxPage({
             ))}
           </ul>
         </aside>
-        <section className="tw-flex-1 tw-flex tw-flex-col">
+        <section className="tw-:flex-1 tw-:flex tw-:flex-col">
           {selectedId ? (
             <>
-              <div className="tw-flex-1 tw-overflow-y-auto tw-mb-4 tw-space-y-2 tw-max-h-[75vh]">
+              <div className="tw-:flex-1 tw-:overflow-y-auto tw-:mb-4 tw-:space-y-2 tw-:max-h-[75vh]">
                 {messages.map((m) => (
                 <div
                   key={m.id}
-                  className={`tw-flex ${
-                    m.direction === "outbound" ? "tw-justify-end" : "tw-justify-start"
+                  className={`tw-:flex ${
+                    m.direction === "outbound" ? "tw-:justify-end" : "tw-:justify-start"
                   }`}
                 >
-                  <div className="tw-px-2 tw-py-1 tw-rounded tw-bg-gray-200 dark:tw-bg-gray-700 tw-flex tw-items-end tw-gap-1">
+                  <div className="tw-:px-2 tw-:py-1 tw-:rounded tw-:bg-gray-200 dark:tw-:bg-gray-700 tw-:flex tw-:items-end tw-:gap-1">
                     {m.text}
                     {m.direction === "outbound" && (
                       <span
-                        className={`tw-text-xs ${
-                          m.readAt ? "tw-text-blue-500" : "tw-text-gray-500"
+                        className={`tw-:text-xs ${
+                          m.readAt ? "tw-:text-blue-500" : "tw-:text-gray-500"
                         }`}
                       >
                         {m.readAt ? "✓✓" : "✓"}
@@ -204,25 +204,25 @@ export function InboxPage({
               ))}
               <div ref={messagesEndRef} />
               </div>
-              <div className="tw-flex tw-gap-2 tw-items-center">
+              <div className="tw-:flex tw-:gap-2 tw-:items-center">
                 {selectedConversation && (
-                  <div className="tw-flex tw-items-center tw-gap-2 tw-flex-1 tw-border dark:tw-border-gray-600 tw-rounded tw-px-2 tw-py-1">
+                  <div className="tw-:flex tw-:items-center tw-:gap-2 tw-:flex-1 tw-:border dark:tw-:border-gray-600 tw-:rounded tw-:px-2 tw-:py-1">
                     {selectedConversation.profilePic ? (
                       <Image
                         src={selectedConversation.profilePic}
                         alt={selectedConversation.name || selectedConversation.psid}
-                        className="tw-w-6 tw-h-6 tw-rounded-full"
+                        className="tw-:w-6 tw-:h-6 tw-:rounded-full"
                         width={24}
                         height={24}
                       />
                     ) : (
-                      <span className="tw-w-6 tw-h-6 tw-rounded-full tw-bg-gray-300" />
+                      <span className="tw-:w-6 tw-:h-6 tw-:rounded-full tw-:bg-gray-300" />
                     )}
                     <input
                       value={text}
                       onChange={(e) => setText(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                      className="tw-flex-1 tw-outline-none tw-bg-transparent"
+                      className="tw-:flex-1 tw-:outline-none tw-:bg-transparent"
                       placeholder={`Message ${
                         selectedConversation.name || selectedConversation.psid
                       }`}
@@ -232,7 +232,7 @@ export function InboxPage({
                 <button
                   type="button"
                   onClick={sendMessage}
-                  className="tw-px-3 tw-py-1 tw-rounded tw-bg-blue-600 tw-text-white disabled:tw-opacity-50"
+                  className="tw-:px-3 tw-:py-1 tw-:rounded tw-:bg-blue-600 tw-:text-white disabled:tw-:opacity-50"
                   disabled={!text.trim()}
                 >
                   Send

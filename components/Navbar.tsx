@@ -17,12 +17,12 @@ export function Navbar() {
     : null;
 
   return (
-    <nav className="tw-border-b tw-bg-yellow-300 dark:tw-bg-yellow-600">
-      <div className="tw-container tw-mx-auto tw-flex tw-h-14 tw-items-center tw-px-4">
-        <Link href="/" className="tw-font-bold tw-text-lg">
+    <nav className="tw-:border-b tw-:bg-yellow-300 dark:tw-:bg-yellow-600">
+      <div className="tw-:container tw-:mx-auto tw-:flex tw-:h-14 tw-:items-center tw-:px-4">
+        <Link href="/" className="tw-:font-bold tw-:text-lg">
           FB Business Messenger
         </Link>
-        <div className="tw-ml-auto tw-flex tw-items-center tw-gap-2">
+        <div className="tw-:ml-auto tw-:flex tw-:items-center tw-:gap-2">
           <Button variant="ghost" asChild>
             <Link href="/">Home</Link>
           </Button>
