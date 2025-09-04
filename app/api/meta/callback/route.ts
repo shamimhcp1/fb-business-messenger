@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { exchangeCodeForToken, exchangeLongLivedUserToken, getPages, subscribePage } from '@/lib/meta'
 import { db } from '@/db'
 import { users, facebookConnections } from '@/db/schema'
-import { and, eq, inArray } from 'drizzle-orm'
+import { and, eq, notInArray } from 'drizzle-orm'
 import { encrypt, pack } from '@/lib/crypto'
 import crypto from 'crypto'
 
@@ -52,18 +52,21 @@ export async function GET(req: Request) {
       return NextResponse.redirect(noUserUrl)
     }
 
-    // If connections for these pages ever existed and were manually deleted,
-    // ensure we start clean to avoid any stale uniqueness edge-cases.
-    if (pages.data.length > 0) {
-      const pageIds = pages.data.map((p) => String(p.id).trim())
+    // Remove any existing connections that aren't present in the latest callback
+    const pageIds = pages.data.map((p) => String(p.id).trim())
+    if (pageIds.length > 0) {
       await db
         .delete(facebookConnections)
         .where(
           and(
             eq(facebookConnections.tenantId, anyUser.tenantId),
-            inArray(facebookConnections.pageId, pageIds)
+            notInArray(facebookConnections.pageId, pageIds)
           )
         )
+    } else {
+      await db
+        .delete(facebookConnections)
+        .where(eq(facebookConnections.tenantId, anyUser.tenantId))
     }
 
     for (const p of pages.data) {
