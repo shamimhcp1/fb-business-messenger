@@ -1,12 +1,13 @@
 import { ConnectionsPage } from '@/components/ConnectionsPage'
 
 interface PageProps {
-  searchParams: {
+  searchParams: Promise<{
     tenantId?: string
-  }
+  }>
 }
 
-export default function Page({ searchParams }: PageProps) {
-  return <ConnectionsPage tenantId={searchParams.tenantId} />
+export default async function Page({ searchParams }: PageProps) {
+  const { tenantId } = await searchParams
+  return <ConnectionsPage tenantId={tenantId} />
 }
 
