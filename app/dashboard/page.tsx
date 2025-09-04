@@ -19,21 +19,21 @@ export default function Page() {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <header className="tw-:flex tw-:h-16 tw-:shrink-0 tw-:items-center tw-:gap-2">
-          <div className="tw-:flex tw-:items-center tw-:gap-2 tw-:px-4">
-            <SidebarTrigger className="tw-:-ml-1" />
+        <header className="flex h-16 shrink-0 items-center gap-2">
+          <div className="flex items-center gap-2 px-4">
+            <SidebarTrigger className="-ml-1" />
             <Separator
               orientation="vertical"
-              className="tw-:mr-2 tw-:data-[orientation=vertical]:h-4"
+              className="mr-2 data-[orientation=vertical]:h-4"
             />
             <Breadcrumb>
               <BreadcrumbList>
-                <BreadcrumbItem className="tw-:hidden tw-:md:block">
+                <BreadcrumbItem className="hidden md:block">
                   <BreadcrumbLink href="#">
                     Building Your Application
                   </BreadcrumbLink>
                 </BreadcrumbItem>
-                <BreadcrumbSeparator className="tw-:hidden tw-:md:block" />
+                <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
                   <BreadcrumbPage>Data Fetching</BreadcrumbPage>
                 </BreadcrumbItem>
@@ -41,13 +41,13 @@ export default function Page() {
             </Breadcrumb>
           </div>
         </header>
-        <div className="tw-:flex tw-:flex-1 tw-:flex-col tw-:gap-4 tw-:p-4 tw-:pt-0">
-          <div className="tw-:grid tw-:auto-rows-min tw-:gap-4 tw-:md:grid-cols-3">
-            <div className="tw-:bg-muted/50 tw-:aspect-video tw-:rounded-xl" />
-            <div className="tw-:bg-muted/50 tw-:aspect-video tw-:rounded-xl" />
-            <div className="tw-:bg-muted/50 tw-:aspect-video tw-:rounded-xl" />
+        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
+            <div className="bg-muted/50 aspect-video rounded-xl" />
+            <div className="bg-muted/50 aspect-video rounded-xl" />
+            <div className="bg-muted/50 aspect-video rounded-xl" />
           </div>
-          <div className="tw-:bg-muted/50 tw-:min-h-[100vh] tw-:flex-1 tw-:rounded-xl tw-:md:min-h-min" />
+          <div className="bg-muted/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min" />
         </div>
       </SidebarInset>
     </SidebarProvider>

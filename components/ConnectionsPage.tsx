@@ -20,29 +20,29 @@ export async function ConnectionsPage({ tenantId }: ConnectionsPageProps) {
     : []
 
   return (
-    <main className="tw-:p-6 tw-:max-w-3xl tw-:mx-auto tw-:space-y-4">
-      <h1 className="tw-:text-xl tw-:font-semibold">Connections</h1>
-      <p className="tw-:text-sm tw-:text-gray-500">
+    <main className="p-6 max-w-3xl mx-auto space-y-4">
+      <h1 className="text-xl font-semibold">Connections</h1>
+      <p className="text-sm text-gray-500">
         Connect your Facebook Page to start receiving messages.
       </p>
       <a
         href="/api/meta/login"
-        className="tw-:inline-flex tw-:items-center tw-:px-4 tw-:py-2 tw-:rounded-md tw-:bg-blue-600 tw-:text-white hover:tw-:bg-blue-700"
+        className="inline-flex items-center px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700"
       >
         Connect Facebook Page
       </a>
-      <ul className="tw-:space-y-2">
+      <ul className="space-y-2">
         {connections.map((conn) => (
           <li
             key={conn.pageId}
-            className="tw-:flex tw-:items-center tw-:justify-between tw-:border tw-:rounded tw-:p-2"
+            className="flex items-center justify-between border rounded p-2"
           >
             <div>
-              <div className="tw-:font-medium">{conn.pageName}</div>
-              <div className="tw-:text-xs tw-:text-gray-500">Tenant: {conn.tenantId}</div>
+              <div className="font-medium">{conn.pageName}</div>
+              <div className="text-xs text-gray-500">Tenant: {conn.tenantId}</div>
             </div>
             <Link
-              className="tw-:underline"
+              className="underline"
               href={`/inbox?tenantId=${conn.tenantId}&pageId=${conn.pageId}`}
             >
               Inbox

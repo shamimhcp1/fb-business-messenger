@@ -16,25 +16,29 @@ export function Navbar() {
       }
     : null;
 
+
   return (
-    <nav className="tw-:border-b tw-:bg-yellow-300 dark:tw-:bg-yellow-600">
-      <div className="tw-:container tw-:mx-auto tw-:flex tw-:h-14 tw-:items-center tw-:px-4">
-        <Link href="/" className="tw-:font-bold tw-:text-lg">
+    <nav className="border-b bg-yellow-300 dark:bg-yellow-600">
+      <div className="container mx-auto flex h-14 items-center px-4">
+        <Link href="/" className="font-bold text-lg">
           FB Business Messenger
         </Link>
-        <div className="tw-:ml-auto tw-:flex tw-:items-center tw-:gap-2">
+        <div className="ml-auto flex items-center gap-2">
           <Button variant="ghost" asChild>
             <Link href="/">Home</Link>
           </Button>
-          <Button variant="ghost" asChild>
-            <Link href="/connections">Connections</Link>
-          </Button>
-          {!user && (
+          {!user ? (
             <Button variant="default" asChild>
               <Link href="/login">Login</Link>
             </Button>
+          ) : (
+              <>
+              <Button variant="ghost" asChild>
+                <Link href="/connections">Connections</Link>
+              </Button>
+              <NavUser user={user} />
+            </>
           )}
-          {user && <NavUser user={user} />}
           <ModeToggle />
         </div>
       </div>

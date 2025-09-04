@@ -26,18 +26,18 @@ export function NavUser({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="tw-:flex tw-:items-center tw-:gap-2">
+        <Button variant="outline" className="flex items-center gap-2">
           <Image
             src={user.avatar}
             alt={label}
             width={24}
             height={24}
-            className="tw-:rounded-full"
+            className="rounded-full"
           />
-          <span className="tw-:hidden sm:tw-:inline">{label}</span>
+          <span className="hidden sm:inline">{label}</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="tw-:w-56" align="start">
+      <DropdownMenuContent className="w-56" align="start">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuGroup>
           <DropdownMenuItem>Profile</DropdownMenuItem>

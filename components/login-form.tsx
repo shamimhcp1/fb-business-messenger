@@ -52,12 +52,12 @@ export function LoginForm({
     if (res?.error) {
       setError("Invalid email or password")
     } else {
-      router.push("/connections")
+      router.push("/")
     }
   }
 
   return (
-    <div className={cn("tw-:flex tw-:flex-col tw-:gap-6", className)} {...props}>
+    <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
       <CardHeader>
         <CardTitle>Login to your account</CardTitle>
@@ -69,13 +69,13 @@ export function LoginForm({
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="tw-:flex tw-:flex-col tw-:gap-6"
+            className="flex flex-col gap-6"
           >
             <FormField
               control={form.control}
               name="email"
               render={({ field }) => (
-                <FormItem className="tw-:grid tw-:gap-3">
+                <FormItem className="grid gap-3">
                   <FormLabel>Email</FormLabel>
                   <FormControl>
                     <Input type="email" placeholder="m@example.com" {...field} />
@@ -88,12 +88,12 @@ export function LoginForm({
               control={form.control}
               name="password"
               render={({ field }) => (
-                <FormItem className="tw-:grid tw-:gap-3">
-                  <div className="tw-:flex tw-:items-center">
+                <FormItem className="grid gap-3">
+                  <div className="flex items-center">
                     <FormLabel>Password</FormLabel>
                     <a
                       href="#"
-                      className="tw-:ml-auto tw-:inline-block tw-:text-sm tw-:underline-offset-4 hover:tw-:underline"
+                      className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
                     >
                       Forgot your password?
                     </a>
@@ -105,9 +105,9 @@ export function LoginForm({
                 </FormItem>
               )}
             />
-            {error && <p className="tw-:text-sm tw-:text-red-500">{error}</p>}
-            <div className="tw-:flex tw-:flex-col tw-:gap-3">
-              <Button type="submit" className="tw-:w-full">
+            {error && <p className="text-sm text-red-500">{error}</p>}
+            <div className="flex flex-col gap-3">
+              <Button type="submit" className="w-full">
                 Login
               </Button>
             </div>

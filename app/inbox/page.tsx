@@ -10,7 +10,7 @@ export default async function Page({
 }) {
   const { tenantId, pageId } = await searchParams
   if (!tenantId || !pageId) {
-    return <div className="tw-:p-6">Missing pageId or tenantId</div>
+    return <div className="p-6">Missing pageId or tenantId</div>
   }
   const conn = await db
     .select({ pageName: facebookConnections.pageName })
