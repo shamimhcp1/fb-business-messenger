@@ -160,12 +160,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <a href="#">
-                <div className="tw-:bg-sidebar-primary tw-:text-sidebar-primary-foreground tw-:flex tw-:aspect-square tw-:size-8 tw-:items-center tw-:justify-center tw-:rounded-lg">
-                  <Command className="tw-:size-4" />
+                <div className="tw-bg-sidebar-primary tw-text-sidebar-primary-foreground tw-flex tw-aspect-square tw-size-8 tw-items-center tw-justify-center tw-rounded-lg">
+                  <Command className="tw-size-4" />
                 </div>
-                <div className="tw-:grid tw-:flex-1 tw-:text-left tw-:text-sm tw-:leading-tight">
-                  <span className="tw-:truncate tw-:font-medium">Acme Inc</span>
-                  <span className="tw-:truncate tw-:text-xs">Enterprise</span>
+                <div className="tw-grid tw-flex-1 tw-text-left tw-text-sm tw-leading-tight">
+                  <span className="tw-truncate tw-font-medium">Acme Inc</span>
+                  <span className="tw-truncate tw-text-xs">Enterprise</span>
                 </div>
               </a>
             </SidebarMenuButton>
@@ -175,7 +175,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <NavMain items={data.navMain} />
         <NavProjects projects={data.projects} />
-        <NavSecondary items={data.navSecondary} className="tw-:mt-auto" />
+        <NavSecondary items={data.navSecondary} className="tw-mt-auto" />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
