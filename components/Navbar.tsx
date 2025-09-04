@@ -32,12 +32,7 @@ export function Navbar() {
               <Link href="/login">Login</Link>
             </Button>
           ) : (
-              <>
-              <Button variant="ghost" asChild>
-                <Link href="/connections">Connections</Link>
-              </Button>
-              <NavUser user={user} />
-            </>
+            <NavUser user={user} />
           )}
           <ModeToggle />
         </div>
