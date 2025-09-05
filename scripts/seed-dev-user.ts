@@ -13,7 +13,10 @@ async function main() {
   // Import db and schema after env is loaded, so DATABASE_URL is set
   const { db } = await import('../db')
   const {permissionCategories } = await import('../db/schema')
-  await db.insert(permissionCategories).values({ name: 'general' })
+  await db
+    .insert(permissionCategories)
+    .values({ name: "general" })
+    .onConflictDoNothing();
 
   console.log("Seeded dev permissionCategories:");
 }
