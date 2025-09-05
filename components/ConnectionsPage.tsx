@@ -6,9 +6,10 @@ import { Badge } from '@/components/ui/badge'
 
 interface ConnectionsPageProps {
   tenantId: string
+  canConnect: boolean
 }
 
-export async function ConnectionsPage({ tenantId }: ConnectionsPageProps) {
+export async function ConnectionsPage({ tenantId, canConnect }: ConnectionsPageProps) {
   const connections = await db
     .select()
     .from(facebookConnections)
@@ -22,12 +23,14 @@ export async function ConnectionsPage({ tenantId }: ConnectionsPageProps) {
       <p className="text-sm text-gray-500">
         Connect your Facebook Page to start receiving messages.
       </p>
-      <a
-        href={`/api/meta/login`}
-        className="inline-flex items-center px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700"
-      >
-        {connections.length > 0 ? "Reconnect" : "Connect"} Facebook Pages
-      </a>
+      {canConnect && (
+        <a
+          href={`/api/meta/login`}
+          className="inline-flex items-center px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700"
+        >
+          {connections.length > 0 ? "Reconnect" : "Connect"} Facebook Pages
+        </a>
+      )}
       <ul className="space-y-2">
         {connections.map((conn) => (
           <li

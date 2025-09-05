@@ -5,10 +5,11 @@ import { and, eq } from 'drizzle-orm'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { redirect } from 'next/navigation'
+import { userHasPermission } from '@/lib/permissions'
 
 export default async function Page({ params }: { params: { tenantId: string; connId: string } }) {
-  const { tenantId, connId } = await params;
-  
+  const { tenantId, connId } = params;
+
   const session = await getServerSession(authOptions);
 
   if (!session) {
@@ -17,6 +18,13 @@ export default async function Page({ params }: { params: { tenantId: string; con
 
   if (!connId || !tenantId) {
     return <div className="p-6">Require pageId and tenantId </div>;
+  }
+
+  const allowed = session.userId
+    ? await userHasPermission(session.userId, tenantId, "view_inbox")
+    : false;
+  if (!allowed) {
+    return <div className="p-6">Forbidden</div>;
   }
 
   const conn = await db
