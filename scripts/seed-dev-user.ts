@@ -55,7 +55,13 @@ async function main() {
       tenantId,
     },
     {
-      name: "manage_tenant_settings",
+      name: "tenant_update",
+      categoryName: "general",
+      roleName: "owner",
+      tenantId,
+    },
+    {
+      name: "tenant_delete",
       categoryName: "general",
       roleName: "owner",
       tenantId,
@@ -80,7 +86,13 @@ async function main() {
       tenantId,
     },
     {
-      name: "manage_tenant_settings",
+      name: "tenant_update",
+      categoryName: "general",
+      roleName: "admin",
+      tenantId,
+    },
+    {
+      name: "tenant_delete",
       categoryName: "general",
       roleName: "admin",
       tenantId,
