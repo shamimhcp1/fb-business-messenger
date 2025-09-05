@@ -3,15 +3,14 @@
 import * as React from "react"
 import {
   AudioWaveform,
-  BookOpen,
-  Bot,
+  Box,
   Command,
   Frame,
   GalleryVerticalEnd,
   Map,
   PieChart,
-  Settings2,
-  SquareTerminal,
+  User2,
+  Facebook
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -59,7 +58,7 @@ export function AppSidebar(
       {
         title: "Facebook",
         url: "#",
-        icon: SquareTerminal,
+        icon: Box,
         isActive: true,
         items: [
           {
@@ -69,67 +68,21 @@ export function AppSidebar(
         ],
       },
       {
-        title: "Models",
+        title: "Users",
         url: "#",
-        icon: Bot,
+        icon: User2,
         items: [
           {
-            title: "Genesis",
-            url: "#",
+            title: "List Users",
+            url: `/app/${tenantId}/users`,
           },
           {
-            title: "Explorer",
-            url: "#",
+            title: "Add User",
+            url: `/app/${tenantId}/users/add`,
           },
           {
-            title: "Quantum",
-            url: "#",
-          },
-        ],
-      },
-      {
-        title: "Documentation",
-        url: "#",
-        icon: BookOpen,
-        items: [
-          {
-            title: "Introduction",
-            url: "#",
-          },
-          {
-            title: "Get Started",
-            url: "#",
-          },
-          {
-            title: "Tutorials",
-            url: "#",
-          },
-          {
-            title: "Changelog",
-            url: "#",
-          },
-        ],
-      },
-      {
-        title: "Settings",
-        url: "#",
-        icon: Settings2,
-        items: [
-          {
-            title: "General",
-            url: "#",
-          },
-          {
-            title: "Team",
-            url: "#",
-          },
-          {
-            title: "Billing",
-            url: "#",
-          },
-          {
-            title: "Limits",
-            url: "#",
+            title: "Role & Permissions",
+            url: `/app/${tenantId}/role-permissions`,
           },
         ],
       },

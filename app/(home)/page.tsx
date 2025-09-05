@@ -8,6 +8,7 @@ import { eq, and, inArray } from "drizzle-orm";
 import { TenantActions } from "@/components/tenant-actions";
 import { TenantCreateDialog } from "@/components/tenant-create-dialog";
 import { BriefcaseBusiness } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
@@ -16,7 +17,11 @@ export default async function Home() {
   }
 
   const items = await db
-    .select({ id: tenants.id, name: tenants.name })
+    .select({
+      id: tenants.id,
+      name: tenants.name,
+      roleName: userRoles.roleName,
+    })
     .from(tenants)
     .innerJoin(userRoles, eq(tenants.id, userRoles.tenantId))
     .where(eq(userRoles.userId, session.userId!));
@@ -52,9 +57,13 @@ export default async function Home() {
             key={t.id}
             className="flex items-center justify-between border dark:border-gray-600 px-4 py-2 rounded"
           >
-            <Link className="font-medium flex items-center capitalize" href={`/app/${t.id}`}>
-              <BriefcaseBusiness className="h-4 w-4 mr-2" />
-              {t.name}
+            <Link
+              className="font-medium flex items-center gap-2 capitalize hover:cursor-pointer"
+              href={`/app/${t.id}`}
+            >
+              <BriefcaseBusiness className="h-4 w-4" />
+              <span>{t.name}</span>
+              <Badge variant={"outline"}>{t.roleName}</Badge>
             </Link>
             <TenantActions
               tenantId={t.id}
