@@ -1,3 +1,4 @@
+// app/app/[tenantId]/users/page.tsx
 import { db } from "@/db";
 import { roles, userRoles } from "@/db/schema";
 import { eq } from "drizzle-orm";
@@ -8,12 +9,16 @@ import { authOptions } from "@/lib/auth";
 import { userHasPermission } from "@/lib/permissions";
 
 export default async function Page({ params }: { params: { tenantId: string } }) {
-  const { tenantId } = params;
+  const { tenantId } = await params;
 
   const session = await getServerSession(authOptions);
   const canManageUsers = session?.userId
     ? await userHasPermission(session.userId, tenantId, "manage_users")
     : false;
+  
+  if (!canManageUsers) {
+    return <div className="p-6">Forbidden</div>;
+  }
 
   const roleRows = await db
     .select({ name: roles.name })
@@ -34,9 +39,7 @@ export default async function Page({ params }: { params: { tenantId: string } })
     <main className="p-6 min-w-5xl mx-auto space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Users</h1>
-        {canManageUsers && (
-          <UserRoleDialog tenantId={tenantId} roles={roleNames} />
-        )}
+        <UserRoleDialog tenantId={tenantId} roles={roleNames} />
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
@@ -45,7 +48,7 @@ export default async function Page({ params }: { params: { tenantId: string } })
               <th className="py-2">Email</th>
               <th className="py-2">Role</th>
               <th className="py-2">Status</th>
-              {canManageUsers && <th className="py-2 text-right">Actions</th>}
+              <th className="py-2 text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y dark:divide-gray-700">
@@ -60,8 +63,7 @@ export default async function Page({ params }: { params: { tenantId: string } })
                     {u.status}
                   </Badge>
                 </td>
-                {canManageUsers && (
-                  <td className="py-2 text-right">
+                <td className="py-2 text-right">
                     <UserRoleDialog
                       tenantId={tenantId}
                       roles={roleNames}
@@ -69,7 +71,6 @@ export default async function Page({ params }: { params: { tenantId: string } })
                       trigger={<button className="underline">Edit</button>}
                     />
                   </td>
-                )}
               </tr>
             ))}
           </tbody>
