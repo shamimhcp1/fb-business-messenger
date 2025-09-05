@@ -4,6 +4,9 @@ import { db } from "@/db";
 import { userRoles } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 
+// Ensured server-side compatibility for middleware by explicitly setting export const runtime = "nodejs" so database access and Node’s crypto module work at runtime
+export const runtime = "nodejs";
+
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   if (pathname.startsWith("/app/")) {
