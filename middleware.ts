@@ -14,7 +14,10 @@ export async function middleware(req: NextRequest) {
     const tenantId = parts[2];
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
     if (!token?.userId || typeof tenantId !== "string") {
-      return NextResponse.redirect(new URL("/login", req.url));
+      // Use original request origin so redirects respect proxied hosts
+      // (e.g., localtunnel or other reverse proxies).
+      const loginUrl = new URL("/login", req.nextUrl.origin);
+      return NextResponse.redirect(loginUrl);
     }
     const rows = await db
       .select({ id: userRoles.id })
@@ -22,7 +25,9 @@ export async function middleware(req: NextRequest) {
       .where(and(eq(userRoles.userId, token.userId as string), eq(userRoles.tenantId, tenantId)))
       .limit(1);
     if (!rows.length) {
-      return NextResponse.redirect(new URL("/", req.url));
+      // Preserve forwarded origin for consistent redirects behind proxies.
+      const rootUrl = new URL("/", req.nextUrl.origin);
+      return NextResponse.redirect(rootUrl);
     }
   }
   return NextResponse.next();
