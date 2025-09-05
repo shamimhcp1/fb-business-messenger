@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { db } from '@/db'
-import { tenants, users } from '@/db/schema'
+import { tenants, users, roles, userRoles } from '@/db/schema'
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 import crypto from 'crypto'
@@ -25,6 +25,15 @@ export async function POST(req: Request) {
   await db.insert(tenants).values({ id: tenantId, name: tenantName })
   const passwordHash = await bcrypt.hash(password, 10)
   const userId = crypto.randomUUID()
-  await db.insert(users).values({ id: userId, email, passwordHash, tenantId, role: 'owner' })
+  await db.insert(users).values({ id: userId, email, passwordHash })
+  await db.insert(roles).values({ name: 'owner', tenantId })
+  await db.insert(userRoles).values({
+    id: crypto.randomUUID(),
+    roleName: 'owner',
+    tenantId,
+    userId,
+    email,
+    status: 'active',
+  })
   return NextResponse.json({ ok: true, userId })
 }

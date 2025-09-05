@@ -1,4 +1,4 @@
-import { pgTable, text, integer, timestamp, uniqueIndex } from 'drizzle-orm/pg-core'
+import { pgTable, text, integer, timestamp, uniqueIndex, primaryKey } from 'drizzle-orm/pg-core'
 
 export const tenants = pgTable('tenants', {
   id: text('id').primaryKey(),
@@ -10,9 +10,44 @@ export const users = pgTable('users', {
   id: text('id').primaryKey(),
   email: text('email').notNull().unique(),
   passwordHash: text('password_hash').notNull(),
-  role: text('role').notNull().default('owner'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
+})
+
+export const roles = pgTable(
+  'roles',
+  {
+    name: text('name').notNull(),
+    tenantId: text('tenant_id').notNull(),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.tenantId, table.name] }),
+  }),
+)
+
+export const permissionCategories = pgTable('permission_categories', {
+  name: text('name').primaryKey(),
+})
+
+export const permissions = pgTable(
+  'permissions',
+  {
+    name: text('name').notNull(),
+    categoryName: text('category_name').notNull().references(() => permissionCategories.name),
+    roleName: text('role_name').notNull(),
+    tenantId: text('tenant_id').notNull(),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.tenantId, table.roleName, table.name] }),
+  }),
+)
+
+export const userRoles = pgTable('user_roles', {
+  id: text('id').primaryKey(),
+  roleName: text('role_name').notNull(),
   tenantId: text('tenant_id').notNull(),
+  userId: text('user_id'),
+  email: text('email').notNull(),
+  status: text('status').notNull().default('pending'),
 })
 
 export const facebookConnections = pgTable('facebook_connections', {

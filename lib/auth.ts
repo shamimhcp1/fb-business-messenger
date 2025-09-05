@@ -1,7 +1,7 @@
 import { NextAuthOptions, Session } from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 import { db } from '@/db'
-import { users } from '@/db/schema'
+import { users, userRoles } from '@/db/schema'
 import { eq } from 'drizzle-orm'
 import bcrypt from 'bcrypt'
 
@@ -25,7 +25,14 @@ export const authOptions: NextAuthOptions = {
         if (!user) return null
         const ok = await bcrypt.compare(credentials.password, user.passwordHash)
         if (!ok) return null
-        return { id: user.id, email: user.email, tenantId: user.tenantId, role: user.role }
+        const role = await db
+          .select()
+          .from(userRoles)
+          .where(eq(userRoles.userId, user.id))
+          .limit(1)
+        const userRole = role[0]
+        if (!userRole) return null
+        return { id: user.id, email: user.email, tenantId: userRole.tenantId, role: userRole.roleName }
       },
     }),
   ],
