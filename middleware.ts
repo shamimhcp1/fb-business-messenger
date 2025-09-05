@@ -15,11 +15,17 @@ export async function middleware(req: NextRequest) {
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
     // Respect forwarded headers so redirects work behind tunnels/proxies
-    // (e.g., localtunnel). Fall back to the request's own origin.
-    const proto =
-      req.headers.get("x-forwarded-proto") ?? req.nextUrl.protocol.replace(":", "");
+    // (e.g., localtunnel). Fall back to the request's own origin. Some
+    // tunnels (like localtunnel) don't set `x-forwarded-proto`, so treat
+    // `*.loca.lt` hosts as HTTPS to ensure correct redirect URLs.
     const host =
       req.headers.get("x-forwarded-host") ?? req.headers.get("host") ?? "";
+    const protoHeader = req.headers.get("x-forwarded-proto");
+    const proto = protoHeader
+      ? protoHeader
+      : host.endsWith(".loca.lt")
+        ? "https"
+        : req.nextUrl.protocol.replace(":", "");
     const origin = `${proto}://${host}`;
 
     if (!token?.userId || typeof tenantId !== "string") {
