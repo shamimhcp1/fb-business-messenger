@@ -21,6 +21,7 @@ export default async function Home() {
       id: tenants.id,
       name: tenants.name,
       roleName: userRoles.roleName,
+      roleStatus: userRoles.status,
     })
     .from(tenants)
     .innerJoin(userRoles, eq(tenants.id, userRoles.tenantId))
@@ -64,6 +65,7 @@ export default async function Home() {
               <BriefcaseBusiness className="h-4 w-4" />
               <span>{t.name}</span>
               <Badge variant={"outline"}>{t.roleName}</Badge>
+              <Badge variant={"outline"}>{t.roleStatus}</Badge>
             </Link>
             <TenantActions
               tenantId={t.id}
