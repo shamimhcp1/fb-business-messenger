@@ -2,8 +2,16 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/db";
-import { tenants } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import {
+  tenants,
+  roles,
+  permissions,
+  userRoles,
+  facebookConnections,
+  conversations,
+  messages,
+} from "@/db/schema";
+import { eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { userHasPermission } from "@/lib/permissions";
 
@@ -38,6 +46,24 @@ export async function DELETE(req: Request, { params }: { params: { tenantId: str
   if (!allowed) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
-  await db.delete(tenants).where(eq(tenants.id, tenantId));
+  await db.transaction(async (tx) => {
+    const convIds = await tx
+      .select({ id: conversations.id })
+      .from(conversations)
+      .where(eq(conversations.tenantId, tenantId));
+    if (convIds.length > 0) {
+      await tx
+        .delete(messages)
+        .where(inArray(messages.conversationId, convIds.map((c) => c.id)));
+    }
+    await tx.delete(conversations).where(eq(conversations.tenantId, tenantId));
+    await tx
+      .delete(facebookConnections)
+      .where(eq(facebookConnections.tenantId, tenantId));
+    await tx.delete(userRoles).where(eq(userRoles.tenantId, tenantId));
+    await tx.delete(permissions).where(eq(permissions.tenantId, tenantId));
+    await tx.delete(roles).where(eq(roles.tenantId, tenantId));
+    await tx.delete(tenants).where(eq(tenants.id, tenantId));
+  });
   return NextResponse.json({ data: { id: tenantId } });
 }
