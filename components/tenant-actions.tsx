@@ -11,6 +11,17 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { TenantForm } from "@/components/tenant-form";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export function TenantActions({
   tenantId,
@@ -57,9 +68,25 @@ export function TenantActions({
         </Dialog>
       )}
       {canDelete && (
-        <Button variant="destructive" onClick={onDelete}>
-          Delete
-        </Button>
+        <AlertDialog>
+          <AlertDialogTrigger>
+            <Button variant="destructive">Delete</Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete
+                the tenant <strong>{tenantName}</strong> and remove all its
+                associated data.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={onDelete} className="bg-red-700 hover:bg-red-500 text-white">Yes Delete</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       )}
     </div>
   );

@@ -7,6 +7,7 @@ import { tenants, userRoles, permissions } from "@/db/schema";
 import { eq, and, inArray } from "drizzle-orm";
 import { TenantActions } from "@/components/tenant-actions";
 import { TenantCreateDialog } from "@/components/tenant-create-dialog";
+import { BriefcaseBusiness } from "lucide-react";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
@@ -49,9 +50,10 @@ export default async function Home() {
         {items.map((t) => (
           <div
             key={t.id}
-            className="flex items-center justify-between border p-2 rounded"
+            className="flex items-center justify-between border dark:border-gray-600 px-4 py-2 rounded"
           >
-            <Link className="font-medium" href={`/app/${t.id}`}>
+            <Link className="font-medium flex items-center capitalize" href={`/app/${t.id}`}>
+              <BriefcaseBusiness className="h-4 w-4 mr-2" />
               {t.name}
             </Link>
             <TenantActions
