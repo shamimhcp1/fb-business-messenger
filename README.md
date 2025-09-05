@@ -146,6 +146,12 @@ SEED_USER_PASSWORD=change-me
 
 This script is for local/dev usage only.
 
+To remove all data from the database during development:
+
+```bash
+npm run db:clear
+```
+
 5) Start the app
 
 ```bash
