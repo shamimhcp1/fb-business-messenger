@@ -3,6 +3,7 @@ import path from 'node:path'
 import { config as loadEnv } from 'dotenv'
 import crypto from 'node:crypto'
 import bcrypt from 'bcrypt'
+import { eq } from 'drizzle-orm'
 
 async function main() {
   const envLocal = path.resolve(process.cwd(), '.env.local')
@@ -14,11 +15,12 @@ async function main() {
 
   // Import db and schema after env is loaded, so DATABASE_URL is set
   const { db } = await import('../db')
-  const { tenants, users } = await import('../db/schema')
+  const { tenants, users, roles, permissionCategories, permissions, userRoles } = await import('../db/schema')
   const existing = await db.select().from(users).limit(1)
   if (existing.length) {
+    const role = await db.select().from(userRoles).where(eq(userRoles.userId, existing[0].id)).limit(1)
     console.log('Users already exist. Skipping seed.')
-    console.log({ userId: existing[0].id, tenantId: existing[0].tenantId })
+    console.log({ userId: existing[0].id, tenantId: role[0]?.tenantId })
     return
   }
 
@@ -29,15 +31,23 @@ async function main() {
   const passwordHash = await bcrypt.hash(password, 10)
 
   await db.insert(tenants).values({ id: tenantId, name: 'Antorbon' })
-  await db.insert(users).values({
-    id: userId,
-    email,
-    passwordHash,
-    role: 'owner',
+  await db.insert(users).values({ id: userId, email, passwordHash })
+  await db.insert(roles).values({ name: 'owner', tenantId })
+  await db.insert(permissionCategories).values({ name: 'general' })
+  await db.insert(permissions).values([
+    { name: 'manage_users', categoryName: 'general', roleName: 'owner', tenantId },
+    { name: 'view_inbox', categoryName: 'general', roleName: 'owner', tenantId },
+  ])
+  await db.insert(userRoles).values({
+    id: crypto.randomUUID(),
+    roleName: 'owner',
     tenantId,
+    userId,
+    email,
+    status: 'active',
   })
 
-  console.log('Seeded dev tenant and user:')
+  console.log('Seeded dev tenant, user and permissions:')
   console.log({ tenantId, userId, email, password })
 }
 
