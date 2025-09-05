@@ -32,12 +32,73 @@ async function main() {
 
   await db.insert(tenants).values({ id: tenantId, name: 'Antorbon' })
   await db.insert(users).values({ id: userId, email, passwordHash })
-  await db.insert(roles).values({ name: 'owner', tenantId })
+  await db.insert(roles).values([{ name: 'owner', tenantId }, { name: 'admin', tenantId }, { name: 'customer_support', tenantId } ])
   await db.insert(permissionCategories).values({ name: 'general' })
   await db.insert(permissions).values([
-    { name: 'manage_users', categoryName: 'general', roleName: 'owner', tenantId },
-    { name: 'view_inbox', categoryName: 'general', roleName: 'owner', tenantId },
-  ])
+    // owner permissions
+    {
+      name: "manage_users",
+      categoryName: "general",
+      roleName: "owner",
+      tenantId,
+    },
+    {
+      name: "view_inbox",
+      categoryName: "general",
+      roleName: "owner",
+      tenantId,
+    },
+    {
+      name: "view_connections",
+      categoryName: "general",
+      roleName: "owner",
+      tenantId,
+    },
+    {
+      name: "manage_tenant_settings",
+      categoryName: "general",
+      roleName: "owner",
+      tenantId,
+    },
+    // admin permissions
+    {
+      name: "manage_users",
+      categoryName: "general",
+      roleName: "admin",
+      tenantId,
+    },
+    {
+      name: "view_inbox",
+      categoryName: "general",
+      roleName: "admin",
+      tenantId,
+    },
+    {
+      name: "view_connections",
+      categoryName: "general",
+      roleName: "admin",
+      tenantId,
+    },
+    {
+      name: "manage_tenant_settings",
+      categoryName: "general",
+      roleName: "admin",
+      tenantId,
+    },
+    // customer_support permissions
+    {
+      name: "view_inbox",
+      categoryName: "general",
+      roleName: "customer_support",
+      tenantId,
+    },
+    {
+      name: "view_connections",
+      categoryName: "general",
+      roleName: "customer_support",
+      tenantId,
+    },
+  ]);
   await db.insert(userRoles).values({
     id: crypto.randomUUID(),
     roleName: 'owner',
@@ -48,7 +109,7 @@ async function main() {
   })
 
   console.log('Seeded dev tenant, user and permissions:')
-  console.log({ tenantId, userId, email, password })
+  console.log({ tenantId, userId, email })
 }
 
 main().catch((err) => {

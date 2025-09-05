@@ -28,7 +28,6 @@ import {
 
 const registerSchema = z
   .object({
-    tenantName: z.string().min(2, "Business name is required"),
     email: z.string().email(),
     password: z.string().min(8, "Password must be at least 8 characters"),
     confirmPassword: z
@@ -49,7 +48,6 @@ export function RegisterForm({
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      tenantName: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -62,7 +60,6 @@ export function RegisterForm({
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        tenantName: values.tenantName,
         email: values.email,
         password: values.password,
       }),
@@ -99,22 +96,6 @@ export function RegisterForm({
               onSubmit={form.handleSubmit(onSubmit)}
               className="flex flex-col gap-6"
             >
-              <FormField
-                control={form.control}
-                name="tenantName"
-                render={({ field }) => (
-                  <FormItem className="grid gap-3">
-                    <FormLabel>Business Name</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Your Business Name"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
               <FormField
                 control={form.control}
                 name="email"
