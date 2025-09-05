@@ -66,7 +66,9 @@ export default async function Home() {
             >
               <BriefcaseBusiness className="h-4 w-4" />
               <span>{t.name}</span>
-              <Badge variant={"outline"}>{t.roleName}</Badge>
+              <Badge variant={"outline"}>
+                {t.roleName.split("_").join(" ")}
+              </Badge>
               <Badge variant={"outline"}>{t.roleStatus}</Badge>
             </Link>
             {t.roleStatus === "pending" ? (

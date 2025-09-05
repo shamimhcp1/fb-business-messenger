@@ -17,7 +17,7 @@ export default async function Page({ params }: { params: { tenantId: string } })
   const roleNames = roleRows.map((r) => r.name).filter((n) => n !== "owner");
   const users = userRows.filter((u) => u.roleName !== "owner");
   return (
-    <main className="p-6 max-w-3xl mx-auto space-y-4">
+    <main className="p-6 min-w-5xl mx-auto space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Users</h1>
         <UserRoleDialog tenantId={tenantId} roles={roleNames} />
@@ -36,7 +36,7 @@ export default async function Page({ params }: { params: { tenantId: string } })
             {users.map((u) => (
               <tr key={u.id}>
                 <td className="py-2 font-medium">{u.email}</td>
-                <td className="py-2 capitalize">{u.roleName}</td>
+                <td className="py-2 capitalize">{u.roleName.split("_").join(" ")}</td>
                 <td className="py-2"><Badge variant="outline" className="capitalize">{u.status}</Badge></td>
                 <td className="py-2 text-right">
                   <UserRoleDialog

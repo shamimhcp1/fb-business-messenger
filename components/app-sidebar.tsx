@@ -77,10 +77,6 @@ export function AppSidebar(
             url: `/app/${tenantId}/users`,
           },
           {
-            title: "Add User",
-            url: `/app/${tenantId}/users/add`,
-          },
-          {
             title: "Role & Permissions",
             url: `/app/${tenantId}/role-permissions`,
           },
