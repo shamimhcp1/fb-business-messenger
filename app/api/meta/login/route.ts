@@ -19,7 +19,7 @@ export async function GET(req: Request) {
   url.searchParams.set('redirect_uri', redirectUri)
   url.searchParams.set('scope', scope)
   url.searchParams.set('response_type', 'code')
-  if (tenantId) url.searchParams.set('state', tenantId)
+  if (tenantId) url.searchParams.set("tenantId", tenantId);
   return NextResponse.redirect(url.toString())
 }
 

@@ -23,7 +23,7 @@ export async function GET(req: Request) {
   const { searchParams } = currentUrl;
   const code = searchParams.get("code");
   const error = searchParams.get("error");
-  const tenantId = searchParams.get("state");
+  const tenantId = searchParams.get("tenantId");
 
   // Build absolute redirect URLs using public base URL or forwarded headers
   const baseUrl = getBaseUrl(req);
