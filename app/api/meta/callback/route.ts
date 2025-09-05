@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server'
 import { exchangeCodeForToken, exchangeLongLivedUserToken, getPages, subscribePage } from '@/lib/meta'
 import { db } from '@/db'
-import { users, facebookConnections } from '@/db/schema'
+import { facebookConnections } from '@/db/schema'
 import { and, eq, notInArray } from 'drizzle-orm'
 import { encrypt, pack } from '@/lib/crypto'
 import crypto from 'crypto'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+import { userHasPermission } from '@/lib/permissions'
 
 function getBaseUrl(req: Request) {
   const envBase = process.env.NEXT_PUBLIC_BASE_URL?.trim()
@@ -20,11 +23,17 @@ export async function GET(req: Request) {
   const { searchParams } = currentUrl;
   const code = searchParams.get("code");
   const error = searchParams.get("error");
-  const tenantId = "561c76f1-5533-4afb-9263-e03412320b9a"; // MVP: placeholder tenantId, need to be dynamic
+  const tenantId = searchParams.get("state");
 
   // Build absolute redirect URLs using public base URL or forwarded headers
   const baseUrl = getBaseUrl(req);
-  const connectionsUrl = new URL(`/app/${tenantId}/connections`, baseUrl);
+  const connectionsUrl = tenantId
+    ? new URL(`/app/${tenantId}/connections`, baseUrl)
+    : new URL(baseUrl);
+  if (!tenantId) {
+    connectionsUrl.searchParams.set("error", "missing_tenant");
+    return NextResponse.redirect(connectionsUrl);
+  }
   if (error) {
     connectionsUrl.search = "";
     connectionsUrl.searchParams.set("error", error);
@@ -36,6 +45,25 @@ export async function GET(req: Request) {
     return NextResponse.redirect(connectionsUrl);
   }
 
+  const session = await getServerSession(authOptions);
+  if (!session?.userId) {
+    const unauthUrl = new URL(connectionsUrl);
+    unauthUrl.search = "";
+    unauthUrl.searchParams.set("error", "unauthorized");
+    return NextResponse.redirect(unauthUrl);
+  }
+  const allowed = await userHasPermission(
+    session.userId,
+    tenantId,
+    "manage_users"
+  );
+  if (!allowed) {
+    const forbiddenUrl = new URL(connectionsUrl);
+    forbiddenUrl.search = "";
+    forbiddenUrl.searchParams.set("error", "forbidden");
+    return NextResponse.redirect(forbiddenUrl);
+  }
+
   const base = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
   const redirectUri = `${base}/api/meta/callback`;
 
@@ -44,16 +72,6 @@ export async function GET(req: Request) {
     const long = await exchangeLongLivedUserToken(short.access_token);
     const pages = await getPages(long.access_token);
 
-    // MVP: associate pages with the first tenant found for the first user (placeholder).
-    // In real flow, use session to get authenticated user and tenant.
-    const anyUser = (await db.select().from(users).limit(1))[0];
-    if (!anyUser) {
-      const noUserUrl = new URL(connectionsUrl);
-      noUserUrl.search = "";
-      noUserUrl.searchParams.set("error", "no_user");
-      return NextResponse.redirect(noUserUrl);
-    }
-
     // Remove any existing connections that aren't present in the latest callback
     const pageIds = pages.data.map((p) => String(p.id).trim());
     if (pageIds.length > 0) {
@@ -61,14 +79,14 @@ export async function GET(req: Request) {
         .delete(facebookConnections)
         .where(
           and(
-            eq(facebookConnections.tenantId, anyUser.tenantId),
+            eq(facebookConnections.tenantId, tenantId),
             notInArray(facebookConnections.pageId, pageIds)
           )
         );
     } else {
       await db
         .delete(facebookConnections)
-        .where(eq(facebookConnections.tenantId, anyUser.tenantId));
+        .where(eq(facebookConnections.tenantId, tenantId));
     }
 
     for (const p of pages.data) {
@@ -77,11 +95,11 @@ export async function GET(req: Request) {
         .insert(facebookConnections)
         .values({
           id: crypto.randomUUID(),
-          tenantId: anyUser.tenantId,
+          tenantId,
           pageId: String(p.id).trim(),
           pageName: p.name,
           pageTokenEnc: enc,
-          connectedByUserId: anyUser.id,
+          connectedByUserId: session.userId,
           status: "active",
         })
         .onConflictDoUpdate({

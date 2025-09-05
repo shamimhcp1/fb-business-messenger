@@ -25,7 +25,7 @@ export async function ConnectionsPage({ tenantId, canConnect }: ConnectionsPageP
       </p>
       {canConnect && (
         <a
-          href={`/api/meta/login`}
+          href={`/api/meta/login?tenantId=${tenantId}`}
           className="inline-flex items-center px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700"
         >
           {connections.length > 0 ? "Reconnect" : "Connect"} Facebook Pages
