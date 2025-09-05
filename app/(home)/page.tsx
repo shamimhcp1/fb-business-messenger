@@ -24,7 +24,7 @@ export default async function Home() {
     })
     .from(tenants)
     .innerJoin(userRoles, eq(tenants.id, userRoles.tenantId))
-    .where(eq(userRoles.userId, session.userId!));
+    .where(eq(userRoles.email, session.email!));
 
   const perms = await db
     .select({ tenantId: permissions.tenantId, name: permissions.name })
