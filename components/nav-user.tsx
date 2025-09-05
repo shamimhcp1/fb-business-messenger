@@ -12,6 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useRouter } from "next/navigation";
 
 export function NavUser({
   user,
@@ -21,7 +22,8 @@ export function NavUser({
     email?: string | null;
     avatar: string;
   };
-}) {
+  }) {
+  const router = useRouter();
   const label = user.name ?? user.email ?? "User";
   return (
     <DropdownMenu>
@@ -38,7 +40,7 @@ export function NavUser({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="start">
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuItem className="cursor-pointer" onClick={() => router.push('/')}>My Account</DropdownMenuItem>
         <DropdownMenuGroup>
           <DropdownMenuItem>Profile</DropdownMenuItem>
           <DropdownMenuItem>Billing</DropdownMenuItem>
@@ -47,6 +49,7 @@ export function NavUser({
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => signOut({ callbackUrl: "/login" })}
+          className="cursor-pointer"
         >
           Log out
         </DropdownMenuItem>

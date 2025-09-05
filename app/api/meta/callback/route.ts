@@ -16,44 +16,46 @@ function getBaseUrl(req: Request) {
 }
 
 export async function GET(req: Request) {
-  const currentUrl = new URL(req.url)
-  const { searchParams } = currentUrl
-  const code = searchParams.get('code')
-  const error = searchParams.get('error')
+  const currentUrl = new URL(req.url);
+  const { searchParams } = currentUrl;
+  const code = searchParams.get("code");
+  const error = searchParams.get("error");
+  const tenantId = "561c76f1-5533-4afb-9263-e03412320b9a"; // MVP: placeholder tenantId, need to be dynamic
+
   // Build absolute redirect URLs using public base URL or forwarded headers
-  const baseUrl = getBaseUrl(req)
-  const connectionsUrl = new URL('/connections', baseUrl)
+  const baseUrl = getBaseUrl(req);
+  const connectionsUrl = new URL(`/app/${tenantId}/connections`, baseUrl);
   if (error) {
-    connectionsUrl.search = ''
-    connectionsUrl.searchParams.set('error', error)
-    return NextResponse.redirect(connectionsUrl)
+    connectionsUrl.search = "";
+    connectionsUrl.searchParams.set("error", error);
+    return NextResponse.redirect(connectionsUrl);
   }
   if (!code) {
-    connectionsUrl.search = ''
-    connectionsUrl.searchParams.set('error', 'missing_code')
-    return NextResponse.redirect(connectionsUrl)
+    connectionsUrl.search = "";
+    connectionsUrl.searchParams.set("error", "missing_code");
+    return NextResponse.redirect(connectionsUrl);
   }
 
-  const base = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
-  const redirectUri = `${base}/api/meta/callback`
+  const base = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+  const redirectUri = `${base}/api/meta/callback`;
 
   try {
-    const short = await exchangeCodeForToken({ code, redirectUri })
-    const long = await exchangeLongLivedUserToken(short.access_token)
-    const pages = await getPages(long.access_token)
+    const short = await exchangeCodeForToken({ code, redirectUri });
+    const long = await exchangeLongLivedUserToken(short.access_token);
+    const pages = await getPages(long.access_token);
 
     // MVP: associate pages with the first tenant found for the first user (placeholder).
     // In real flow, use session to get authenticated user and tenant.
-    const anyUser = (await db.select().from(users).limit(1))[0]
+    const anyUser = (await db.select().from(users).limit(1))[0];
     if (!anyUser) {
-      const noUserUrl = new URL(connectionsUrl)
-      noUserUrl.search = ''
-      noUserUrl.searchParams.set('error', 'no_user')
-      return NextResponse.redirect(noUserUrl)
+      const noUserUrl = new URL(connectionsUrl);
+      noUserUrl.search = "";
+      noUserUrl.searchParams.set("error", "no_user");
+      return NextResponse.redirect(noUserUrl);
     }
 
     // Remove any existing connections that aren't present in the latest callback
-    const pageIds = pages.data.map((p) => String(p.id).trim())
+    const pageIds = pages.data.map((p) => String(p.id).trim());
     if (pageIds.length > 0) {
       await db
         .delete(facebookConnections)
@@ -62,15 +64,15 @@ export async function GET(req: Request) {
             eq(facebookConnections.tenantId, anyUser.tenantId),
             notInArray(facebookConnections.pageId, pageIds)
           )
-        )
+        );
     } else {
       await db
         .delete(facebookConnections)
-        .where(eq(facebookConnections.tenantId, anyUser.tenantId))
+        .where(eq(facebookConnections.tenantId, anyUser.tenantId));
     }
 
     for (const p of pages.data) {
-      const enc = pack(encrypt(p.access_token))
+      const enc = pack(encrypt(p.access_token));
       await db
         .insert(facebookConnections)
         .values({
@@ -80,39 +82,45 @@ export async function GET(req: Request) {
           pageName: p.name,
           pageTokenEnc: enc,
           connectedByUserId: anyUser.id,
-          status: 'active',
+          status: "active",
         })
         .onConflictDoUpdate({
           target: [facebookConnections.tenantId, facebookConnections.pageId],
           set: {
             pageName: p.name,
             pageTokenEnc: enc,
-            status: 'active',
+            status: "active",
           },
-        })
+        });
       // Ignore "already subscribed" errors so DB writes are not rolled back by a Graph API 400.
       try {
-        await subscribePage(p.id, p.access_token)
+        await subscribePage(p.id, p.access_token);
       } catch (err: unknown) {
         const msg =
-          (err as { response?: { data?: { error?: { message?: string } } }; message?: string })
-            .response?.data?.error?.message || (err as Error).message || ''
+          (
+            err as {
+              response?: { data?: { error?: { message?: string } } };
+              message?: string;
+            }
+          ).response?.data?.error?.message ||
+          (err as Error).message ||
+          "";
         if (!/already\s+subscribed/i.test(msg)) {
-          throw err
+          throw err;
         }
       }
     }
 
-    const okUrl = new URL(connectionsUrl)
-    okUrl.search = ''
-    okUrl.searchParams.set('ok', '1')
-    return NextResponse.redirect(okUrl)
+    const okUrl = new URL(connectionsUrl);
+    okUrl.search = "";
+    okUrl.searchParams.set("ok", "1");
+    return NextResponse.redirect(okUrl);
   } catch (e: unknown) {
-    const errUrl = new URL(connectionsUrl)
-    errUrl.search = ''
-    const msg = e instanceof Error ? e.message : 'oauth_failed'
-    errUrl.searchParams.set('error', msg)
-    return NextResponse.redirect(errUrl)
+    const errUrl = new URL(connectionsUrl);
+    errUrl.search = "";
+    const msg = e instanceof Error ? e.message : "oauth_failed";
+    errUrl.searchParams.set("error", msg);
+    return NextResponse.redirect(errUrl);
   }
 }
 

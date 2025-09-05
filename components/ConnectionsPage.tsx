@@ -23,7 +23,7 @@ export async function ConnectionsPage({ tenantId }: ConnectionsPageProps) {
         Connect your Facebook Page to start receiving messages.
       </p>
       <a
-        href="/api/meta/login"
+        href={`/api/meta/login`}
         className="inline-flex items-center px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700"
       >
         {connections.length > 0 ? "Reconnect" : "Connect"} Facebook Pages
@@ -42,7 +42,7 @@ export async function ConnectionsPage({ tenantId }: ConnectionsPageProps) {
             </div>
             <Link
               className="underline"
-              href={`/inbox?tenantId=${conn.tenantId}&pageId=${conn.pageId}`}
+              href={`/app/${tenantId}/connections/${conn.id}/inbox`}
             >
               Inbox
             </Link>

@@ -173,7 +173,7 @@ export function InboxPage({
                       ) : (
                         <span className="w-6 h-6 rounded-full bg-gray-300" />
                       )}
-                      <span>{c.name || c.psid}</span>
+                      <span>{c.name} {c.psid}</span>
                     </span>
                   </button>
                 </li>

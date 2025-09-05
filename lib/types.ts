@@ -1,3 +1,13 @@
+export interface FacebookConnection {
+  id: string;
+  tenantId: string;
+  pageId: string;
+  pageName: string;
+  connectedByUserId: string | null;
+  status: string;
+  connectedAt: string | null;
+}
+
 export interface Conversation {
   id: string;
   tenantId: string;
@@ -11,7 +21,7 @@ export interface Conversation {
   profilePic?: string;
 }
 
-export type MessageDirection = 'inbound' | 'outbound';
+export type MessageDirection = "inbound" | "outbound";
 
 export interface Message {
   id: string;
