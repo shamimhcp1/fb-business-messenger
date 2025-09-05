@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
 import "@/styles/globals.css";
-import { Navbar } from "@/components/Navbar";
 import { Providers } from "./providers";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TailwindIndicator } from "@/components/tailwind-indicator";
 
 export const metadata: Metadata = {
-  title: "FB Business Messenger",
-  description: "Manage your Facebook messaging in one place.",
+  title: "FB Business Manager",
+  description: "Manage your Facebook Business accounts and users.",
 };
 
 export default function RootLayout({
