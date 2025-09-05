@@ -7,6 +7,7 @@ import { tenants, userRoles, permissions } from "@/db/schema";
 import { eq, and, inArray } from "drizzle-orm";
 import { TenantActions } from "@/components/tenant-actions";
 import { TenantCreateDialog } from "@/components/tenant-create-dialog";
+import { PendingRoleActions } from "@/components/pending-role-actions";
 import { BriefcaseBusiness } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
@@ -20,6 +21,7 @@ export default async function Home() {
     .select({
       id: tenants.id,
       name: tenants.name,
+      roleId: userRoles.id,
       roleName: userRoles.roleName,
       roleStatus: userRoles.status,
     })
@@ -67,12 +69,16 @@ export default async function Home() {
               <Badge variant={"outline"}>{t.roleName}</Badge>
               <Badge variant={"outline"}>{t.roleStatus}</Badge>
             </Link>
-            <TenantActions
-              tenantId={t.id}
-              tenantName={t.name}
-              canEdit={canEdit.has(t.id)}
-              canDelete={canDelete.has(t.id)}
-            />
+            {t.roleStatus === "pending" ? (
+              <PendingRoleActions roleId={t.roleId} />
+            ) : (
+              <TenantActions
+                tenantId={t.id}
+                tenantName={t.name}
+                canEdit={canEdit.has(t.id)}
+                canDelete={canDelete.has(t.id)}
+              />
+            )}
           </div>
         ))}
       </div>
