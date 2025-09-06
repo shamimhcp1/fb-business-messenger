@@ -39,6 +39,7 @@ export interface MessageAttachment {
   type: string;
   payload?: {
     url?: string;
+    title?: string;
     sticker_id?: string;
     animated_url?: string;
   };
