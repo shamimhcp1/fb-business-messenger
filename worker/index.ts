@@ -8,6 +8,8 @@ import { Emitter } from '@socket.io/redis-emitter'
 import crypto from 'crypto'
 import type { RedisOptions } from 'ioredis'
 import type { MessageAttachment } from '@/lib/types'
+import { decrypt, unpack } from '@/lib/crypto'
+import { getSticker } from '@/lib/meta'
 
 const connection: RedisOptions = redis.options
 
@@ -42,7 +44,6 @@ async function upsertFromEntry(entry: WebhookEntry) {
   const mid = messaging.message?.mid ? String(messaging.message.mid).trim() : undefined
   const text = messaging.message?.text || undefined
   const attachments = messaging.message?.attachments
-  const attachmentsJson = attachments && attachments.length > 0 ? JSON.stringify(attachments) : undefined
 
   // Resolve tenant via FacebookConnection
   const conn = (
@@ -54,6 +55,25 @@ async function upsertFromEntry(entry: WebhookEntry) {
   }
 
   if (kind === 'message' && mid) {
+    if (attachments && attachments.length > 0) {
+      const token = decrypt(unpack(conn.pageTokenEnc))
+      for (const a of attachments) {
+        const stickerId = Number(a.sticker_id ?? a.payload?.sticker_id)
+        if (!Number.isNaN(stickerId) && stickerId > 0) {
+          try {
+            const info = await getSticker(stickerId, token)
+            if (info.animated_gif_url) {
+              a.payload = { ...a.payload, animated_url: info.animated_gif_url }
+            }
+          } catch (err) {
+            console.warn('worker:sticker_fetch_error', { pageId, stickerId, err })
+          }
+        }
+      }
+    }
+    const attachmentsJson =
+      attachments && attachments.length > 0 ? JSON.stringify(attachments) : undefined
+
     // Upsert conversation by (tenantId, pageId, psid)
     const convId = crypto.randomUUID()
     const now = new Date(messaging.timestamp || Date.now())
@@ -82,8 +102,8 @@ async function upsertFromEntry(entry: WebhookEntry) {
         and(
           eq(conversations.tenantId, conn.tenantId),
           eq(conversations.pageId, pageId),
-          eq(conversations.psid, psid)
-        )
+          eq(conversations.psid, psid),
+        ),
       )
 
     const conversation = (

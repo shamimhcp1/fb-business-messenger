@@ -222,15 +222,14 @@ export function InboxPage({
                             a.type === "image" ||
                             (typeof a.sticker_id === "number" && a.sticker_id > 0)
                           ) {
+                            const src = a.payload?.animated_url || a.payload?.url || ""
                             const isAnimated =
-                              (typeof a.sticker_id === "number" &&
-                                a.sticker_id > 0) ||
-                              (a.payload?.url?.toLowerCase().endsWith(".gif") ??
-                                false);
+                              Boolean(a.payload?.animated_url) ||
+                              (a.payload?.url?.toLowerCase().endsWith(".gif") ?? false)
                             return (
                               <Image
                                 key={idx}
-                                src={a.payload?.url || ""}
+                                src={src}
                                 alt={a.type}
                                 width={200}
                                 height={200}
