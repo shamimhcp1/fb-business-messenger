@@ -1,8 +1,13 @@
 import { NextResponse } from 'next/server'
-import { exchangeCodeForToken, exchangeLongLivedUserToken, getPages, subscribePage } from '@/lib/meta'
+import {
+  exchangeCodeForToken,
+  exchangeLongLivedUserToken,
+  getPages,
+  subscribePage,
+} from '@/lib/meta'
 import { db } from '@/db'
 import { facebookConnections } from '@/db/schema'
-import { and, eq, notInArray } from 'drizzle-orm'
+import { and, eq, inArray, notInArray } from 'drizzle-orm'
 import { encrypt, pack } from '@/lib/crypto'
 import crypto from 'crypto'
 import { getServerSession } from 'next-auth'
@@ -72,8 +77,17 @@ export async function GET(req: Request) {
     const long = await exchangeLongLivedUserToken(short.access_token);
     const pages = await getPages(long.access_token);
 
-    // Remove any existing connections that aren't present in the latest callback
     const pageIds = pages.data.map((p) => String(p.id).trim());
+    const existing =
+      pageIds.length > 0
+        ? await db
+            .select({ pageId: facebookConnections.pageId })
+            .from(facebookConnections)
+            .where(inArray(facebookConnections.pageId, pageIds))
+        : [];
+    const existingIds = new Set(existing.map((e) => e.pageId));
+
+    // Remove any existing connections that aren't present in the latest callback
     if (pageIds.length > 0) {
       await db
         .delete(facebookConnections)
@@ -90,13 +104,17 @@ export async function GET(req: Request) {
     }
 
     for (const p of pages.data) {
+      const pid = String(p.id).trim();
+      if (existingIds.has(pid)) {
+        continue;
+      }
       const enc = pack(encrypt(p.access_token));
       await db
         .insert(facebookConnections)
         .values({
           id: crypto.randomUUID(),
           tenantId,
-          pageId: String(p.id).trim(),
+          pageId: pid,
           pageName: p.name,
           pageTokenEnc: enc,
           connectedByUserId: session.userId,

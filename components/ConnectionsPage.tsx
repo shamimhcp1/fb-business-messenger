@@ -3,6 +3,7 @@ import { db } from '@/db'
 import { facebookConnections } from '@/db/schema'
 import { eq } from 'drizzle-orm'
 import { Badge } from '@/components/ui/badge'
+import { ConnectionDeleteButton } from '@/components/connection-delete-button'
 
 interface ConnectionsPageProps {
   tenantId: string
@@ -43,12 +44,20 @@ export async function ConnectionsPage({ tenantId, canConnect }: ConnectionsPageP
                 Tenant: {conn.tenantId}
               </div>
             </div>
-            <Link
-              className="underline"
-              href={`/app/${tenantId}/connections/${conn.id}/inbox`}
-            >
-              Inbox
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link
+                className="underline"
+                href={`/app/${tenantId}/connections/${conn.id}/inbox`}
+              >
+                Inbox
+              </Link>
+              {canConnect && (
+                <ConnectionDeleteButton
+                  tenantId={tenantId}
+                  connectionId={conn.id}
+                />
+              )}
+            </div>
           </li>
         ))}
       </ul>
