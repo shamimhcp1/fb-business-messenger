@@ -160,8 +160,9 @@ export function InboxPage({
       <h1 className="text-xl font-semibold mb-4 pb-4 border-b">
         {pageName} <Badge variant={"outline"}>{conversations.length}</Badge>
       </h1>
-      <div className="flex gap-4">
-        <aside className="w-64 border-r">
+      <div className="grid grid-cols-5 gap-6 md:grid-cols-6">
+        {/* conversations */}
+        <aside className="col-span-1 md:col-span-1 w-64 border-r">
           <ul className="space-y-1 h-[75vh]">
             {conversations.length > 0 &&
               conversations.map((c) => (
@@ -194,18 +195,19 @@ export function InboxPage({
               ))}
 
             {conversations.length === 0 && (
-              <li className='text-muted-foreground'>No conversations yet!</li>
+              <li className="text-muted-foreground">No conversations yet!</li>
             )}
           </ul>
         </aside>
-        <section className="flex-1 flex flex-col">
+        {/* messages */}
+        <section className="col-span-3 md:col-span-4 flex-1 flex flex-col border-r">
           {selectedId ? (
             <>
-              <div className="flex-1 overflow-y-auto mb-4 space-y-2 h-[75vh]">
+              <div className="flex-1 overflow-y-auto mb-4 space-y-2 max-h-[75vh]">
                 {messages.map((m) => {
                   const attachments: MessageAttachment[] = m.attachmentsJson
                     ? JSON.parse(m.attachmentsJson)
-                    : []
+                    : [];
                   return (
                     <div
                       key={m.id}
@@ -215,17 +217,20 @@ export function InboxPage({
                           : "justify-start"
                       }`}
                     >
-                      <div className="px-2 py-1 rounded flex flex-col gap-1 max-w-xs">
+                      <div className="px-2 py-1 rounded flex flex-col gap-1 max-w-3xl">
                         {m.text && <span>{m.text}</span>}
                         {attachments.map((a, idx) => {
                           if (
                             a.type === "image" ||
-                            (typeof a.payload?.sticker_id === "number" && a.payload?.sticker_id > 0)
+                            (typeof a.payload?.sticker_id === "number" &&
+                              a.payload?.sticker_id > 0)
                           ) {
-                            const src = a.payload?.animated_url || a.payload?.url || ""
+                            const src =
+                              a.payload?.animated_url || a.payload?.url || "";
                             const isAnimated =
                               Boolean(a.payload?.animated_url) ||
-                              (a.payload?.url?.toLowerCase().endsWith(".gif") ?? false)
+                              (a.payload?.url?.toLowerCase().endsWith(".gif") ??
+                                false);
                             return (
                               <Image
                                 key={idx}
@@ -239,7 +244,9 @@ export function InboxPage({
                             );
                           }
                           if (a.type === "audio") {
-                            return <audio key={idx} controls src={a.payload?.url} />
+                            return (
+                              <audio key={idx} controls src={a.payload?.url} />
+                            );
                           }
                           if (a.type === "video") {
                             return (
@@ -249,7 +256,7 @@ export function InboxPage({
                                 src={a.payload?.url}
                                 className="max-w-full rounded"
                               />
-                            )
+                            );
                           }
                           if (a.type === "fallback") {
                             const rawUrl = a.payload?.url;
@@ -261,10 +268,9 @@ export function InboxPage({
                                 parsed.hostname === "l.facebook.com" &&
                                 parsed.searchParams.has("u")
                               ) {
-                                finalUrl =
-                                  decodeURIComponent(
-                                    parsed.searchParams.get("u") || rawUrl,
-                                  );
+                                finalUrl = decodeURIComponent(
+                                  parsed.searchParams.get("u") || rawUrl
+                                );
                               }
                             } catch {
                               /* ignore parse errors */
@@ -292,7 +298,7 @@ export function InboxPage({
                             >
                               {a.type} attachment
                             </a>
-                          )
+                          );
                         })}
                         {m.direction === "outbound" && (
                           <span
@@ -305,7 +311,7 @@ export function InboxPage({
                         )}
                       </div>
                     </div>
-                  )
+                  );
                 })}
                 <div ref={messagesEndRef} />
               </div>
@@ -346,11 +352,17 @@ export function InboxPage({
                 </button>
               </div>
             </>
-          ) : conversations.length > 0 && (
-            <p className="text-muted-foreground">
-              Select a conversation to view messages.
-            </p>
+          ) : (
+            conversations.length > 0 && (
+              <p className="text-muted-foreground">
+                Select a conversation to view messages.
+              </p>
+            )
           )}
+        </section>
+        {/* profile info */}
+        <section className="col-span-1 md:col-span-1">
+          <p>Profile info</p>
         </section>
       </div>
     </main>
