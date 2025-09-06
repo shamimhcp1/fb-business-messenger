@@ -35,6 +35,14 @@ export interface Message {
   readAt: string | null;
 }
 
+export interface MessageAttachment {
+  type: string;
+  payload?: {
+    url?: string;
+    sticker_id?: string;
+  };
+}
+
 export interface ApiListResponse<T> {
   data: T[];
 }
