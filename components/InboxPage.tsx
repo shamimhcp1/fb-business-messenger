@@ -215,20 +215,29 @@ export function InboxPage({
                           : "justify-start"
                       }`}
                     >
-                      <div className="px-2 py-1 rounded bg-gray-200 dark:bg-gray-700 flex flex-col gap-1 max-w-xs">
+                      <div className="px-2 py-1 rounded flex flex-col gap-1 max-w-xs">
                         {m.text && <span>{m.text}</span>}
                         {attachments.map((a, idx) => {
-                          if (a.type === "image" || a.type === "sticker") {
+                          if (
+                            a.type === "image" ||
+                            (typeof a.sticker_id === "number" && a.sticker_id > 0)
+                          ) {
+                            const isAnimated =
+                              (typeof a.sticker_id === "number" &&
+                                a.sticker_id > 0) ||
+                              (a.payload?.url?.toLowerCase().endsWith(".gif") ??
+                                false);
                             return (
                               <Image
                                 key={idx}
-                                src={a.payload?.url || ''}
+                                src={a.payload?.url || ""}
                                 alt={a.type}
                                 width={200}
                                 height={200}
                                 className="rounded"
+                                unoptimized={isAnimated}
                               />
-                            )
+                            );
                           }
                           if (a.type === "audio") {
                             return <audio key={idx} controls src={a.payload?.url} />

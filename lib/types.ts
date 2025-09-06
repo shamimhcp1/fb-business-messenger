@@ -41,6 +41,7 @@ export interface MessageAttachment {
     url?: string;
     sticker_id?: string;
   };
+  sticker_id?: number;
 }
 
 export interface ApiListResponse<T> {

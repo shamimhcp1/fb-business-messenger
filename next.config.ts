@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "platform-lookaside.fbsbx.com",
+        hostname: "cdn.fbsbx.com",
       },
       {
         protocol: "https",
