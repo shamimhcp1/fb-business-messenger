@@ -218,7 +218,7 @@ export function InboxPage({
                       }`}
                     >
                       <div className="px-2 py-1 rounded flex flex-col gap-1 max-w-3xl">
-                        {m.text && <span>{m.text}</span>}
+                        {m.text && <span className='p-2 rounded-full bg-muted'>{m.text}</span>}
                         {attachments.map((a, idx) => {
                           if (
                             a.type === "image" ||
