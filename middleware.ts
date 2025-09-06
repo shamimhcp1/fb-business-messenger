@@ -13,13 +13,10 @@ export async function middleware(req: NextRequest) {
   if (pathname.startsWith("/app/")) {
     const parts = pathname.split("/");
     const tenantId = parts[2];
-    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-    console.log("token", token);
-
-    // Respect forwarded headers so redirects work behind tunnels/proxies
-    // (e.g., localtunnel). Fall back to the request's own origin. Some
-    // tunnels (like localtunnel) don't set `x-forwarded-proto`, so treat
-    // `*.loca.lt` hosts as HTTPS to ensure correct redirect URLs.
+    // Respect forwarded headers so redirects and secure cookies work behind
+    // tunnels/proxies (e.g., localtunnel). Fall back to the request's own
+    // origin. Some tunnels (like localtunnel) don't set `x-forwarded-proto`,
+    // so treat `*.loca.lt` hosts as HTTPS.
     const host =
       req.headers.get("x-forwarded-host") ?? req.headers.get("host") ?? "";
     console.log("host", host);
@@ -30,6 +27,13 @@ export async function middleware(req: NextRequest) {
         ? "https"
         : req.nextUrl.protocol.replace(":", "");
     const origin = `${proto}://${host}`;
+    const secureCookie = proto === "https";
+    const token = await getToken({
+      req,
+      secret: process.env.NEXTAUTH_SECRET,
+      secureCookie,
+    });
+    console.log("token", token);
 
     if (!token?.userId || typeof tenantId !== "string") {
       const loginUrl = new URL("/login", origin);
