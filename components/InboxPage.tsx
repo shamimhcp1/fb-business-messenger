@@ -251,6 +251,37 @@ export function InboxPage({
                               />
                             )
                           }
+                          if (a.type === "fallback") {
+                            const rawUrl = a.payload?.url;
+                            if (!rawUrl) return null;
+                            let finalUrl = rawUrl;
+                            try {
+                              const parsed = new URL(rawUrl);
+                              if (
+                                parsed.hostname === "l.facebook.com" &&
+                                parsed.searchParams.has("u")
+                              ) {
+                                finalUrl =
+                                  decodeURIComponent(
+                                    parsed.searchParams.get("u") || rawUrl,
+                                  );
+                              }
+                            } catch {
+                              /* ignore parse errors */
+                            }
+                            const label = a.payload?.title || finalUrl;
+                            return (
+                              <a
+                                key={idx}
+                                href={finalUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="underline"
+                              >
+                                {label}
+                              </a>
+                            );
+                          }
                           return (
                             <a
                               key={idx}
