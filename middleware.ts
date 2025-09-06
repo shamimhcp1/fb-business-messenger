@@ -9,7 +9,6 @@ export const runtime = "nodejs";
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  console.log("pathname", pathname);
   if (pathname.startsWith("/app/")) {
     const parts = pathname.split("/");
     const tenantId = parts[2];
@@ -19,7 +18,6 @@ export async function middleware(req: NextRequest) {
     // so treat `*.loca.lt` hosts as HTTPS.
     const host =
       req.headers.get("x-forwarded-host") ?? req.headers.get("host") ?? "";
-    console.log("host", host);
     const protoHeader = req.headers.get("x-forwarded-proto");
     const proto = protoHeader
       ? protoHeader
@@ -33,7 +31,6 @@ export async function middleware(req: NextRequest) {
       secret: process.env.NEXTAUTH_SECRET,
       secureCookie,
     });
-    console.log("token", token);
 
     if (!token?.userId || typeof tenantId !== "string") {
       const loginUrl = new URL("/login", origin);
