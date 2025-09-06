@@ -52,6 +52,13 @@ export async function subscribePage(pageId: string, pageAccessToken: string) {
   return data
 }
 
+export async function unsubscribePage(pageId: string, pageAccessToken: string) {
+  const { data } = await axios.delete(`${API}/${pageId}/subscribed_apps`, {
+    headers: { Authorization: `Bearer ${pageAccessToken}` },
+  })
+  return data
+}
+
 export async function sendMessage(
   pageId: string,
   pageAccessToken: string,
