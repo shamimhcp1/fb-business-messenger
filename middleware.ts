@@ -9,10 +9,12 @@ export const runtime = "nodejs";
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
+  console.log("pathname", pathname);
   if (pathname.startsWith("/app/")) {
     const parts = pathname.split("/");
     const tenantId = parts[2];
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    console.log("token", token);
 
     // Respect forwarded headers so redirects work behind tunnels/proxies
     // (e.g., localtunnel). Fall back to the request's own origin. Some
@@ -20,6 +22,7 @@ export async function middleware(req: NextRequest) {
     // `*.loca.lt` hosts as HTTPS to ensure correct redirect URLs.
     const host =
       req.headers.get("x-forwarded-host") ?? req.headers.get("host") ?? "";
+    console.log("host", host);
     const protoHeader = req.headers.get("x-forwarded-proto");
     const proto = protoHeader
       ? protoHeader
