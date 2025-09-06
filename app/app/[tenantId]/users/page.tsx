@@ -52,18 +52,19 @@ export default async function Page({ params }: { params: { tenantId: string } })
             </tr>
           </thead>
           <tbody className="divide-y dark:divide-gray-700">
-            {users.map((u) => (
-              <tr key={u.id}>
-                <td className="py-2 font-medium">{u.email}</td>
-                <td className="py-2 capitalize">
-                  {u.roleName.split("_").join(" ")}
-                </td>
-                <td className="py-2">
-                  <Badge variant="outline" className="capitalize">
-                    {u.status}
-                  </Badge>
-                </td>
-                <td className="py-2 text-right">
+            {users.length > 0 ? (
+              users.map((u) => (
+                <tr key={u.id}>
+                  <td className="py-2 font-medium">{u.email}</td>
+                  <td className="py-2 capitalize">
+                    {u.roleName.split("_").join(" ")}
+                  </td>
+                  <td className="py-2">
+                    <Badge variant="outline" className="capitalize">
+                      {u.status}
+                    </Badge>
+                  </td>
+                  <td className="py-2 text-right">
                     <UserRoleDialog
                       tenantId={tenantId}
                       roles={roleNames}
@@ -71,8 +72,11 @@ export default async function Page({ params }: { params: { tenantId: string } })
                       trigger={<button className="underline">Edit</button>}
                     />
                   </td>
-              </tr>
-            ))}
+                </tr>
+              ))
+            ) : (
+              <p className="py-4 text-muted-foreground">No users found.</p>
+            )}
           </tbody>
         </table>
       </div>

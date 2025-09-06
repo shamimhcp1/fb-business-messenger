@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { userHasPermission } from "@/lib/permissions";
 
 export default async function Page({ params }: { params: { tenantId: string } }) {
-  const { tenantId } = params;
+  const { tenantId } = await params;
 
   const session = await getServerSession(authOptions);
   if (!session) {

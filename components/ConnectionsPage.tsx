@@ -17,7 +17,7 @@ export async function ConnectionsPage({ tenantId, canConnect }: ConnectionsPageP
     .where(eq(facebookConnections.tenantId, tenantId))
 
   return (
-    <main className="p-6 max-w-3xl mx-auto space-y-4">
+    <main className="p-6 min-w-5xl mx-auto space-y-4">
       <h1 className="text-xl font-semibold">
         Connections <Badge>{connections.length}</Badge>
       </h1>
@@ -36,7 +36,7 @@ export async function ConnectionsPage({ tenantId, canConnect }: ConnectionsPageP
         {connections.map((conn) => (
           <li
             key={conn.pageId}
-            className="flex items-center justify-between border dark:border-gray-700 rounded p-2"
+            className="flex items-center justify-between border dark:border-gray-700 rounded px-4 py-2"
           >
             <div>
               <div className="font-medium">{conn.pageName}</div>
@@ -44,7 +44,7 @@ export async function ConnectionsPage({ tenantId, canConnect }: ConnectionsPageP
                 Tenant: {conn.tenantId}
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-6">
               <Link
                 className="underline"
                 href={`/app/${tenantId}/connections/${conn.id}/inbox`}
