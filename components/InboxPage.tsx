@@ -220,7 +220,7 @@ export function InboxPage({
                         {attachments.map((a, idx) => {
                           if (
                             a.type === "image" ||
-                            (typeof a.sticker_id === "number" && a.sticker_id > 0)
+                            (typeof a.payload?.sticker_id === "number" && a.payload?.sticker_id > 0)
                           ) {
                             const src = a.payload?.animated_url || a.payload?.url || ""
                             const isAnimated =

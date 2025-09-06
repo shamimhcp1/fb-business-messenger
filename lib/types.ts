@@ -42,7 +42,6 @@ export interface MessageAttachment {
     sticker_id?: string;
     animated_url?: string;
   };
-  sticker_id?: number;
 }
 
 export interface ApiListResponse<T> {
