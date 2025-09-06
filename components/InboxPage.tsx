@@ -85,11 +85,11 @@ export function InboxPage({
         setMessages((prev) => [...prev, message])
       }
       setConversations((prev) => {
-        const exists = prev.some((c) => c.id === conversation.id);
-        if (exists) {
-          return prev.map((c) => (c.id === conversation.id ? conversation : c));
-        }
-        return [conversation, ...prev];
+        const existing = prev.find((c) => c.id === conversation.id);
+        const updated = existing ? { ...existing, ...conversation } : conversation;
+        return existing
+          ? prev.map((c) => (c.id === conversation.id ? updated : c))
+          : [updated, ...prev];
       });
 
       // Fetch profile info if missing
@@ -177,7 +177,7 @@ export function InboxPage({
                       ) : (
                         <span className="w-6 h-6 rounded-full bg-gray-300" />
                       )}
-                      <span>{c.name} {c.psid}</span>
+                      <span>{c.name || c.psid}</span>
                     </span>
                   </button>
                 </li>
