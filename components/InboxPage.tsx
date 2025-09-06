@@ -7,6 +7,7 @@ import type {
   Message,
   ApiListResponse,
   ApiItemResponse,
+  MessageAttachment,
 } from '@/lib/types'
 import Image from 'next/image';
 import { getUserProfile } from "@/lib/meta";
@@ -201,29 +202,72 @@ export function InboxPage({
           {selectedId ? (
             <>
               <div className="flex-1 overflow-y-auto mb-4 space-y-2 h-[75vh]">
-                {messages.map((m) => (
-                  <div
-                    key={m.id}
-                    className={`flex ${
-                      m.direction === "outbound"
-                        ? "justify-end"
-                        : "justify-start"
-                    }`}
-                  >
-                    <div className="px-2 py-1 rounded bg-gray-200 dark:bg-gray-700 flex items-end gap-1">
-                      {m.text}
-                      {m.direction === "outbound" && (
-                        <span
-                          className={`text-xs ${
-                            m.readAt ? "text-blue-500" : "text-gray-500"
-                          }`}
-                        >
-                          {m.readAt ? "✓✓" : "✓"}
-                        </span>
-                      )}
+                {messages.map((m) => {
+                  const attachments: MessageAttachment[] = m.attachmentsJson
+                    ? JSON.parse(m.attachmentsJson)
+                    : []
+                  return (
+                    <div
+                      key={m.id}
+                      className={`flex ${
+                        m.direction === "outbound"
+                          ? "justify-end"
+                          : "justify-start"
+                      }`}
+                    >
+                      <div className="px-2 py-1 rounded bg-gray-200 dark:bg-gray-700 flex flex-col gap-1 max-w-xs">
+                        {m.text && <span>{m.text}</span>}
+                        {attachments.map((a, idx) => {
+                          if (a.type === "image" || a.type === "sticker") {
+                            return (
+                              <Image
+                                key={idx}
+                                src={a.payload?.url || ''}
+                                alt={a.type}
+                                width={200}
+                                height={200}
+                                className="rounded"
+                              />
+                            )
+                          }
+                          if (a.type === "audio") {
+                            return <audio key={idx} controls src={a.payload?.url} />
+                          }
+                          if (a.type === "video") {
+                            return (
+                              <video
+                                key={idx}
+                                controls
+                                src={a.payload?.url}
+                                className="max-w-full rounded"
+                              />
+                            )
+                          }
+                          return (
+                            <a
+                              key={idx}
+                              href={a.payload?.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="underline"
+                            >
+                              {a.type} attachment
+                            </a>
+                          )
+                        })}
+                        {m.direction === "outbound" && (
+                          <span
+                            className={`text-xs self-end ${
+                              m.readAt ? "text-blue-500" : "text-gray-500"
+                            }`}
+                          >
+                            {m.readAt ? "✓✓" : "✓"}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
                 <div ref={messagesEndRef} />
               </div>
               <div className="flex gap-2 items-center">

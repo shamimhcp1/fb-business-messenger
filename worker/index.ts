@@ -7,6 +7,7 @@ import { and, eq, sql, lte } from 'drizzle-orm'
 import { Emitter } from '@socket.io/redis-emitter'
 import crypto from 'crypto'
 import type { RedisOptions } from 'ioredis'
+import type { MessageAttachment } from '@/lib/types'
 
 const connection: RedisOptions = redis.options
 
@@ -14,7 +15,7 @@ const queueName = 'webhooks'
 const queueEvents = new QueueEvents(queueName, { connection })
 
 interface MessagingEntry {
-  message?: { mid?: string; text?: string }
+  message?: { mid?: string; text?: string; attachments?: MessageAttachment[] }
   delivery?: { watermark?: number }
   read?: { watermark?: number }
   timestamp?: number
@@ -40,6 +41,8 @@ async function upsertFromEntry(entry: WebhookEntry) {
   const psid = String(messaging.sender?.id || messaging.recipient?.id || '').trim()
   const mid = messaging.message?.mid ? String(messaging.message.mid).trim() : undefined
   const text = messaging.message?.text || undefined
+  const attachments = messaging.message?.attachments
+  const attachmentsJson = attachments && attachments.length > 0 ? JSON.stringify(attachments) : undefined
 
   // Resolve tenant via FacebookConnection
   const conn = (
@@ -105,6 +108,7 @@ async function upsertFromEntry(entry: WebhookEntry) {
         direction: 'inbound',
         mid,
         text,
+        attachmentsJson,
         timestamp: now,
       })
       .onConflictDoNothing({ target: messages.mid })
