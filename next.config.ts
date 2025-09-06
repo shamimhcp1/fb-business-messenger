@@ -17,14 +17,17 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "cdn.fbsbx.com",
+        pathname: "/**",
       },
       {
         protocol: "https",
         hostname: "i.pravatar.cc",
+        pathname: "/**",
       },
       {
         protocol: "https",
         hostname: "**.fbcdn.net",
+        pathname: "/**",
       },
     ],
   },
