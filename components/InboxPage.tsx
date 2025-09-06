@@ -82,7 +82,9 @@ export function InboxPage({
       conversation: Conversation
     }) => {
       if (selectedIdRef.current === conversationId) {
-        setMessages((prev) => [...prev, message])
+        setMessages((prev) =>
+          prev.some((m) => m.id === message.id) ? prev : [...prev, message],
+        )
       }
       setConversations((prev) => {
         const existing = prev.find((c) => c.id === conversation.id);
@@ -130,6 +132,7 @@ export function InboxPage({
 
   const sendMessage = async () => {
     if (!selectedId || !text.trim()) return
+    const conversation = conversations.find((c) => c.id === selectedId)
     await fetchJson<{ message: Message }>(
       `/api/inbox/conversations/${selectedId}/messages?tenantId=${tenantId}&pageId=${pageId}`,
       {
@@ -138,7 +141,13 @@ export function InboxPage({
         body: JSON.stringify({ text }),
       },
     ).then((data) => {
-      setMessages((prev) => [...prev, data.message])
+      if (conversation) {
+        socket.emit('message:new', {
+          conversationId: selectedId,
+          message: data.message,
+          conversation,
+        })
+      }
       setText('')
     })
   }
