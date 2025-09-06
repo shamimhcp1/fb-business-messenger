@@ -10,8 +10,8 @@ export function Navbar() {
   const { data: session } = useSession();
   const user = session
     ? {
-        name: session.user?.name ?? session.user?.email ?? "User",
-        email: session.user?.email ?? undefined,
+        name: session?.user?.name ?? session?.user?.email ?? "User",
+        email: session?.user?.email ?? undefined,
         avatar: "https://i.pravatar.cc/150?img=4",
       }
     : null;

@@ -24,17 +24,19 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
+import { useSession } from "next-auth/react";
 
 export function AppSidebar(
   props: React.ComponentProps<typeof Sidebar> & { tenantId: string }
 ) {
   const { tenantId, ...sidebarProps } = props;
+  const { data: session } = useSession();
 
   // This is sample data.
   const data = {
     user: {
-      name: "Shamim Hossain",
-      email: "m@example.com",
+      name: session?.user?.name ?? session?.user?.email ?? "User",
+      email: session?.user?.email ?? undefined,
       avatar: "https://i.pravatar.cc/150?img=4",
     },
     teams: [
