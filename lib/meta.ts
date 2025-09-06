@@ -78,3 +78,14 @@ export async function getUserProfile(psid: string, pageAccessToken: string) {
   return data as { name?: string; picture?: { data?: { url?: string } } }
 }
 
+export async function getSticker(stickerId: number, pageAccessToken: string) {
+  const { data } = await axios.get<{ animated_gif_url?: string }>(
+    `${API}/${stickerId}`,
+    {
+      params: { fields: 'animated_gif_url' },
+      headers: { Authorization: `Bearer ${pageAccessToken}` },
+    },
+  )
+  return data
+}
+
