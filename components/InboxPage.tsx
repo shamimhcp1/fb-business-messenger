@@ -67,6 +67,10 @@ export function InboxPage({
   // WebSocket setup and cleanup on mount/unmount
   useEffect(() => {
     socketRef.current = socket
+    // Join tenant and page rooms for realtime updates
+    if (tenantId && pageId) {
+      socket.emit('join', [`tenant:${tenantId}`, `page:${pageId}`])
+    }
 
     const handleMessageNew = ({
       conversationId,
